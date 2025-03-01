@@ -43,6 +43,17 @@ export const getPlaces = async () => {
   return data;
 };
 
+export const addPlace = async (placeData: Omit<Place, 'id'>) => {
+  const { data, error } = await supabase
+    .from('places')
+    .insert([placeData])
+    .select()
+    .single();
+  
+  if (error) throw error;
+  return data;
+};
+
 export const getUserPlaces = async (userId: string) => {
   const { data, error } = await supabase
     .from('user_places')
