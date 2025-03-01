@@ -3,6 +3,10 @@ import styled from 'styled-components';
 
 const SettingsContainer = styled.div`
   padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
 `;
 
 const SettingsSection = styled.div`
@@ -11,6 +15,8 @@ const SettingsSection = styled.div`
   padding: 16px;
   margin-bottom: 20px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 500px;
 `;
 
 const ToggleSwitch = styled.label`

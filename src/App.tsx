@@ -14,6 +14,17 @@ const AppContainer = styled.div`
   background-color: #f9f7f2;
   min-height: 100vh;
   padding-bottom: 70px; /* Space for the navigation bar */
+  display: flex;
+  flex-direction: column;
+  max-width: 100%;
+  overflow-x: hidden;
+  
+  @media (min-width: 768px) {
+    max-width: 600px;
+    margin: 0 auto;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    min-height: 100vh;
+  }
 `;
 
 function App() {

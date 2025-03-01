@@ -3,6 +3,10 @@ import styled from 'styled-components';
 
 const PlacesContainer = styled.div`
   padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
 `;
 
 const PlacesList = styled.div`
@@ -10,6 +14,8 @@ const PlacesList = styled.div`
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 20px;
   margin-top: 20px;
+  width: 100%;
+  max-width: 500px;
 `;
 
 const PlaceCard = styled.div`

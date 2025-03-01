@@ -3,10 +3,16 @@ import styled from 'styled-components';
 
 const HomeContainer = styled.div`
   padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
 `;
 
 const StatusList = styled.div`
   margin-top: 20px;
+  width: 100%;
+  max-width: 500px;
 `;
 
 const CheckInButton = styled.button`
