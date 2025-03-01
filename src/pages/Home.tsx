@@ -4,7 +4,8 @@ import Modal from '../components/Modal';
 import CheckInForm from '../components/CheckInForm';
 import StatusCard from '../components/StatusCard';
 import { Status } from '../types';
-import { checkIn, getActiveStatuses } from '../services/supabase';
+import { checkIn, getActiveStatuses, supabase } from '../services/supabase';
+import { useAuth } from '../contexts/AuthContext';
 
 const HomeContainer = styled.div`
   padding: 20px;
@@ -57,8 +58,8 @@ const EmptyState = styled.div`
   margin-top: 20px;
 `;
 
-// Mock data for active statuses (will be replaced with data from Supabase)
-const mockStatuses: Status[] = [
+// Fallback mock data in case Supabase connection fails
+const fallbackMockStatuses: Status[] = [
   {
     id: '1',
     user_id: '101',
@@ -125,56 +126,52 @@ const Home: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [statuses, setStatuses] = useState<Status[]>([]);
   const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
 
   useEffect(() => {
-    // In a real app, this would fetch from Supabase
-    // For now, we'll use mock data
     const fetchStatuses = async () => {
       try {
         setLoading(true);
-        // const data = await getActiveStatuses();
-        // setStatuses(data || []);
-        
-        // Using mock data for now
-        setStatuses(mockStatuses);
+        const data = await getActiveStatuses();
+        setStatuses(data || []);
       } catch (error) {
         console.error('Error fetching statuses:', error);
+        // Fallback to mock data if Supabase fails
+        setStatuses(fallbackMockStatuses);
       } finally {
         setLoading(false);
       }
     };
 
     fetchStatuses();
+
+    // Set up real-time subscription for status updates
+    const statusSubscription = supabase
+      .channel('public:statuses')
+      .on('postgres_changes', { 
+        event: '*', 
+        schema: 'public', 
+        table: 'statuses' 
+      }, (payload: any) => {
+        console.log('Status change received!', payload);
+        fetchStatuses();
+      })
+      .subscribe();
+
+    return () => {
+      statusSubscription.unsubscribe();
+    };
   }, []);
 
   const handleCheckIn = async (data: { placeId: string; activity: string; privacy: 'all' | 'intended' | 'specific' }) => {
+    if (!user) {
+      console.error('User not authenticated');
+      return;
+    }
+
     try {
-      // In a real app, this would send to Supabase
-      // const result = await checkIn('current-user-id', data.placeId, data.activity, data.privacy);
-      
-      // For now, we'll just add to our local state
-      const newStatus: Status = {
-        id: `local-${Date.now()}`,
-        user_id: 'current-user',
-        place_id: data.placeId,
-        activity: data.activity,
-        privacy: data.privacy,
-        timestamp: new Date().toISOString(),
-        is_active: true,
-        users: {
-          id: 'current-user',
-          email: 'me@example.com',
-          username: 'You',
-          created_at: new Date().toISOString()
-        },
-        places: mockStatuses.find(s => s.place_id === data.placeId)?.places || {
-          id: data.placeId,
-          name: `Place ${data.placeId}`,
-          type: 'unknown'
-        }
-      };
-      
-      setStatuses([newStatus, ...statuses]);
+      await checkIn(user.id, data.placeId, data.activity, data.privacy);
+      // The real-time subscription will update the UI
       setIsModalOpen(false);
     } catch (error) {
       console.error('Error checking in:', error);
@@ -182,7 +179,11 @@ const Home: React.FC = () => {
   };
 
   const handleJoin = (status: Status) => {
-    // In a real app, this would create a new check-in with the same place and activity
+    if (!user) {
+      console.error('User not authenticated');
+      return;
+    }
+
     handleCheckIn({
       placeId: status.place_id,
       activity: status.activity,

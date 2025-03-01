@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
+import { getPlaces } from '../services/supabase';
+import { Place } from '../types';
 
 const FormContainer = styled.div`
   background-color: var(--secondary-color);
@@ -90,8 +92,8 @@ const SubmitButton = styled(Button)`
   }
 `;
 
-// Mock data for places (will be replaced with data from Supabase)
-const mockPlaces = [
+// Fallback mock data in case Supabase connection fails
+const fallbackPlaces = [
   { id: '1', name: 'MycoCafe', type: 'cafe' },
   { id: '2', name: 'North Boulder Park', type: 'park' },
   { id: '3', name: 'Tonic Coworking', type: 'coworking' },
@@ -111,6 +113,26 @@ const CheckInForm: React.FC<CheckInFormProps> = ({ onClose, onSubmit }) => {
   const [placeId, setPlaceId] = useState('');
   const [activity, setActivity] = useState('');
   const [privacy, setPrivacy] = useState<'all' | 'intended' | 'specific'>('all');
+  const [places, setPlaces] = useState<Place[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchPlaces = async () => {
+      try {
+        setLoading(true);
+        const data = await getPlaces();
+        setPlaces(data || []);
+      } catch (error) {
+        console.error('Error fetching places:', error);
+        // Fallback to mock data if Supabase fails
+        setPlaces(fallbackPlaces);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPlaces();
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -134,9 +156,10 @@ const CheckInForm: React.FC<CheckInFormProps> = ({ onClose, onSubmit }) => {
             value={placeId} 
             onChange={(e) => setPlaceId(e.target.value)}
             required
+            disabled={loading}
           >
             <option value="">Select a place</option>
-            {mockPlaces.map(place => (
+            {places.map(place => (
               <option key={place.id} value={place.id}>
                 {place.name}
               </option>

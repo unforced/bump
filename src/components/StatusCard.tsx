@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Status } from '../types';
+import { useAuth } from '../contexts/AuthContext';
 
 const Card = styled.div`
   background-color: var(--secondary-color);
@@ -57,29 +58,66 @@ const JoinButton = styled.button`
   }
 `;
 
+const SelfTag = styled.span`
+  background-color: #4a7c59;
+  color: white;
+  font-size: 0.7rem;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-left: 8px;
+`;
+
 interface StatusCardProps {
   status: Status;
   onJoin: (status: Status) => void;
 }
 
 const StatusCard: React.FC<StatusCardProps> = ({ status, onJoin }) => {
+  const { user } = useAuth();
+  const isCurrentUser = user?.id === status.user_id;
+  
   // Format timestamp to a readable format
   const formatTime = (timestamp: string) => {
     const date = new Date(timestamp);
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
   
+  // Get username from user metadata or fallback to email
+  const getUserName = () => {
+    if (isCurrentUser) {
+      return 'You';
+    }
+    
+    if (status.users?.username) {
+      return status.users.username;
+    }
+    
+    // Try to get username from metadata if available
+    const userData = status.users as any; // Type assertion to access user_metadata
+    if (userData?.user_metadata?.username) {
+      return userData.user_metadata.username;
+    }
+    
+    // Fallback to email or anonymous
+    return status.users?.email?.split('@')[0] || 'Anonymous';
+  };
+  
   return (
     <Card>
       <CardHeader>
-        <UserName>{status.users?.username || 'Anonymous'}</UserName>
+        <UserName>
+          {getUserName()}
+          {isCurrentUser && <SelfTag>You</SelfTag>}
+        </UserName>
         <TimeStamp>{formatTime(status.timestamp)}</TimeStamp>
       </CardHeader>
       <PlaceName>{status.places?.name || 'Unknown location'}</PlaceName>
       <Activity>{status.activity}</Activity>
-      <JoinButton onClick={() => onJoin(status)}>
-        Join
-      </JoinButton>
+      {!isCurrentUser && (
+        <JoinButton onClick={() => onJoin(status)}>
+          Join
+        </JoinButton>
+      )}
     </Card>
   );
 };
