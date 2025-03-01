@@ -1,5 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
+import { useAuth } from '../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 const SettingsContainer = styled.div`
   padding: 20px;
@@ -81,11 +83,53 @@ const SaveButton = styled.button`
   }
 `;
 
+const LogoutButton = styled.button`
+  background-color: #e74c3c; /* Red */
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 24px;
+  font-size: 16px;
+  cursor: pointer;
+  margin-top: 20px;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    background-color: #c0392b;
+    transform: scale(1.05);
+  }
+`;
+
+const ButtonGroup = styled.div`
+  display: flex;
+  gap: 16px;
+  margin-top: 20px;
+`;
+
 const Settings: React.FC = () => {
+  const { signOut, user } = useAuth();
+  const navigate = useNavigate();
+  
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      navigate('/login');
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
+  };
+  
   return (
     <SettingsContainer>
       <h1>Settings</h1>
       <p>Customize your Bump experience</p>
+      
+      {user && (
+        <SettingsSection>
+          <h2>Account</h2>
+          <p>Logged in as: {user.email}</p>
+        </SettingsSection>
+      )}
       
       <SettingsSection>
         <h2>Availability</h2>
@@ -111,7 +155,10 @@ const Settings: React.FC = () => {
         </div>
       </SettingsSection>
       
-      <SaveButton>Save Settings</SaveButton>
+      <ButtonGroup>
+        <SaveButton>Save Settings</SaveButton>
+        <LogoutButton onClick={handleLogout}>Logout</LogoutButton>
+      </ButtonGroup>
     </SettingsContainer>
   );
 };

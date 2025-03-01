@@ -5,7 +5,10 @@ import Places from './pages/Places';
 import Friends from './pages/Friends';
 import Meetups from './pages/Meetups';
 import Settings from './pages/Settings';
+import Login from './pages/Login';
 import Navigation from './components/Navigation';
+import ProtectedRoute from './components/ProtectedRoute';
+import { AuthProvider } from './contexts/AuthContext';
 import './App.css';
 
 const AppContainer = styled.div`
@@ -27,20 +30,50 @@ const AppContainer = styled.div`
   }
 `;
 
+const MainLayout = ({ children }: { children: React.ReactNode }) => (
+  <AppContainer>
+    {children}
+    <Navigation />
+  </AppContainer>
+);
+
 function App() {
   return (
-    <Router>
-      <AppContainer>
+    <AuthProvider>
+      <Router>
         <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/places" element={<Places />} />
-          <Route path="/friends" element={<Friends />} />
-          <Route path="/meetups" element={<Meetups />} />
-          <Route path="/settings" element={<Settings />} />
+          <Route path="/login" element={<Login />} />
+          
+          <Route element={<ProtectedRoute />}>
+            <Route path="/" element={
+              <MainLayout>
+                <Home />
+              </MainLayout>
+            } />
+            <Route path="/places" element={
+              <MainLayout>
+                <Places />
+              </MainLayout>
+            } />
+            <Route path="/friends" element={
+              <MainLayout>
+                <Friends />
+              </MainLayout>
+            } />
+            <Route path="/meetups" element={
+              <MainLayout>
+                <Meetups />
+              </MainLayout>
+            } />
+            <Route path="/settings" element={
+              <MainLayout>
+                <Settings />
+              </MainLayout>
+            } />
+          </Route>
         </Routes>
-        <Navigation />
-      </AppContainer>
-    </Router>
+      </Router>
+    </AuthProvider>
   );
 }
 

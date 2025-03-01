@@ -1,9 +1,10 @@
 import { createClient } from '@supabase/supabase-js';
+import { User, Place, UserPlace, Status, Meetup, Friend, Settings } from '../types';
 
 // These would typically come from environment variables
-// For the MVP, we'll hardcode them here
-const supabaseUrl = 'YOUR_SUPABASE_URL';
-const supabaseKey = 'YOUR_SUPABASE_KEY';
+// For the MVP, we'll use import.meta.env for Vite
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'YOUR_SUPABASE_URL';
+const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'YOUR_SUPABASE_KEY';
 
 // Create a single supabase client for interacting with your database
 export const supabase = createClient(supabaseUrl, supabaseKey);
