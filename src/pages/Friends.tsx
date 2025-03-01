@@ -98,6 +98,7 @@ const Friends: React.FC = () => {
       
       try {
         setLoading(true);
+        setError(''); // Clear any previous errors
         const data = await getFriends(user.id);
         setFriends(data || []);
       } catch (error) {
@@ -111,42 +112,41 @@ const Friends: React.FC = () => {
     fetchFriends();
 
     // Set up real-time subscription for friend updates
-    const friendsSubscription = supabase
-      .channel('public:friends')
-      .on('postgres_changes', { 
-        event: '*', 
-        schema: 'public', 
-        table: 'friends',
-        filter: `user_id=eq.${user?.id}` 
-      }, (payload: any) => {
-        console.log('Friend change received!', payload);
-        fetchFriends();
-      })
-      .subscribe();
+    let friendsSubscription: { unsubscribe: () => void } | undefined;
+    if (user) {
+      friendsSubscription = supabase
+        .channel('public:friends')
+        .on('postgres_changes', { 
+          event: '*', 
+          schema: 'public', 
+          table: 'friends',
+          filter: `user_id=eq.${user.id}` 
+        }, (payload: any) => {
+          console.log('Friend change received!', payload);
+          fetchFriends();
+        })
+        .subscribe();
+    }
 
     return () => {
-      friendsSubscription.unsubscribe();
+      if (friendsSubscription) {
+        friendsSubscription.unsubscribe();
+      }
     };
   }, [user]);
 
-  const handleAddFriend = async (data: { email: string; intendToBump: 'off' | 'private' | 'shared' }) => {
+  const handleAddFriend = async (data: { friendId: string }) => {
     if (!user) return;
     
     try {
       setLoading(true);
       setError('');
       
-      // In a real app, we would first search for the user by email
-      // For now, we'll simulate finding a user with a random ID
-      const friendId = `friend-${Date.now()}`;
+      // Add friend with default intend_to_bump set to 'off'
+      await addFriend(user.id, data.friendId);
       
-      await addFriend(user.id, friendId, data.intendToBump);
-      
-      setSuccess(`Friend request sent to ${data.email}`);
+      setSuccess(`Friend added successfully`);
       setIsModalOpen(false);
-      
-      // In a real app, we would refresh the friends list here
-      // The real-time subscription should handle this for us
     } catch (error) {
       console.error('Error adding friend:', error);
       setError('Failed to add friend. Please try again later.');
@@ -202,7 +202,8 @@ const Friends: React.FC = () => {
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
         <AddFriendForm 
           onClose={() => setIsModalOpen(false)} 
-          onSubmit={handleAddFriend} 
+          onSubmit={handleAddFriend}
+          currentUserId={user?.id || ''}
         />
       </Modal>
     </FriendsContainer>

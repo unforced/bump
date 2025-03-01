@@ -10,13 +10,19 @@ const Card = styled.div`
   margin-bottom: 16px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
   transition: transform 0.3s ease;
   
   &:hover {
     transform: translateY(-3px);
   }
+`;
+
+const FriendInfoRow = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
 `;
 
 const FriendInfo = styled.div`
@@ -36,16 +42,22 @@ const FriendEmail = styled.p`
   color: #666;
 `;
 
-const IntendToggle = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 8px;
+const IntendSection = styled.div`
+  border-top: 1px solid #eee;
+  padding-top: 12px;
+  margin-top: 8px;
 `;
 
-const ToggleLabel = styled.span`
-  font-size: 0.8rem;
-  color: #666;
+const IntendHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+`;
+
+const IntendLabel = styled.span`
+  font-size: 0.9rem;
+  font-weight: 500;
 `;
 
 const ToggleSelect = styled.select`
@@ -77,11 +89,10 @@ const StatusIndicator = styled.div<{ status: 'off' | 'private' | 'shared' }>`
 const StatusWrapper = styled.div`
   display: flex;
   align-items: center;
-  margin-top: 4px;
 `;
 
 const StatusText = styled.span`
-  font-size: 0.8rem;
+  font-size: 0.9rem;
   color: #666;
 `;
 
@@ -142,27 +153,32 @@ const FriendCard: React.FC<FriendCardProps> = ({ friend, onUpdate }) => {
   
   return (
     <Card>
-      <FriendInfo>
-        <FriendName>{getFriendName()}</FriendName>
-        <FriendEmail>{friend.friend?.email}</FriendEmail>
+      <FriendInfoRow>
+        <FriendInfo>
+          <FriendName>{getFriendName()}</FriendName>
+          <FriendEmail>{friend.friend?.email}</FriendEmail>
+        </FriendInfo>
+      </FriendInfoRow>
+      
+      <IntendSection>
+        <IntendHeader>
+          <IntendLabel>Intend to Bump</IntendLabel>
+          <ToggleSelect 
+            value={intendToBump} 
+            onChange={handleIntendChange}
+            disabled={isUpdating}
+          >
+            <option value="off">Off</option>
+            <option value="private">Private</option>
+            <option value="shared">Shared</option>
+          </ToggleSelect>
+        </IntendHeader>
+        
         <StatusWrapper>
           <StatusIndicator status={intendToBump} />
           <StatusText>{getStatusText(intendToBump)}</StatusText>
         </StatusWrapper>
-      </FriendInfo>
-      
-      <IntendToggle>
-        <ToggleLabel>Intend to Bump</ToggleLabel>
-        <ToggleSelect 
-          value={intendToBump} 
-          onChange={handleIntendChange}
-          disabled={isUpdating}
-        >
-          <option value="off">Off</option>
-          <option value="private">Private</option>
-          <option value="shared">Shared</option>
-        </ToggleSelect>
-      </IntendToggle>
+      </IntendSection>
     </Card>
   );
 };

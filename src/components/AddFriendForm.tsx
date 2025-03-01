@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
+import UserSelector from './UserSelector';
 
 const FormContainer = styled.div`
   background-color: var(--secondary-color);
@@ -24,32 +25,6 @@ const Label = styled.label`
   display: block;
   margin-bottom: 8px;
   font-weight: 500;
-`;
-
-const Input = styled.input`
-  width: 100%;
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  font-size: 16px;
-  
-  &:focus {
-    outline: none;
-    border-color: var(--primary-color);
-  }
-`;
-
-const RadioGroup = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-`;
-
-const RadioOption = styled.label`
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
 `;
 
 const ButtonGroup = styled.div`
@@ -94,29 +69,23 @@ const ErrorMessage = styled.p`
 
 interface AddFriendFormProps {
   onClose: () => void;
-  onSubmit: (data: { email: string; intendToBump: 'off' | 'private' | 'shared' }) => void;
+  onSubmit: (data: { friendId: string }) => void;
+  currentUserId: string;
 }
 
-const AddFriendForm: React.FC<AddFriendFormProps> = ({ onClose, onSubmit }) => {
-  const [email, setEmail] = useState('');
-  const [intendToBump, setIntendToBump] = useState<'off' | 'private' | 'shared'>('off');
+const AddFriendForm: React.FC<AddFriendFormProps> = ({ onClose, onSubmit, currentUserId }) => {
+  const [friendId, setFriendId] = useState('');
   const [error, setError] = useState('');
   
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Simple email validation
-    if (!email.trim()) {
-      setError('Please enter an email address');
+    if (!friendId) {
+      setError('Please select a user');
       return;
     }
     
-    if (!email.includes('@')) {
-      setError('Please enter a valid email address');
-      return;
-    }
-    
-    onSubmit({ email, intendToBump });
+    onSubmit({ friendId });
   };
   
   return (
@@ -124,55 +93,12 @@ const AddFriendForm: React.FC<AddFriendFormProps> = ({ onClose, onSubmit }) => {
       <FormTitle>Add Friend</FormTitle>
       <form onSubmit={handleSubmit}>
         <FormGroup>
-          <Label htmlFor="email">Friend's Email</Label>
-          <Input 
-            id="email" 
-            type="email" 
-            placeholder="friend@example.com" 
-            value={email} 
-            onChange={(e) => setEmail(e.target.value)}
-            required
+          <UserSelector 
+            onSelect={setFriendId} 
+            excludeIds={[currentUserId]} 
+            label="Select a user to add as a friend"
           />
           {error && <ErrorMessage>{error}</ErrorMessage>}
-        </FormGroup>
-        
-        <FormGroup>
-          <Label>Intend to Bump</Label>
-          <RadioGroup>
-            <RadioOption>
-              <input 
-                type="radio" 
-                id="off" 
-                name="intendToBump" 
-                value="off" 
-                checked={intendToBump === 'off'} 
-                onChange={() => setIntendToBump('off')} 
-              />
-              <span>Off - Don't notify me about their check-ins</span>
-            </RadioOption>
-            <RadioOption>
-              <input 
-                type="radio" 
-                id="private" 
-                name="intendToBump" 
-                value="private" 
-                checked={intendToBump === 'private'} 
-                onChange={() => setIntendToBump('private')} 
-              />
-              <span>Private - I want to know when they check in (they won't know)</span>
-            </RadioOption>
-            <RadioOption>
-              <input 
-                type="radio" 
-                id="shared" 
-                name="intendToBump" 
-                value="shared" 
-                checked={intendToBump === 'shared'} 
-                onChange={() => setIntendToBump('shared')} 
-              />
-              <span>Shared - We both want to bump into each other</span>
-            </RadioOption>
-          </RadioGroup>
         </FormGroup>
         
         <ButtonGroup>

@@ -15,6 +15,15 @@ export const getCurrentUser = async () => {
   return user;
 };
 
+export const getAllUsers = async () => {
+  const { data, error } = await supabase
+    .from('users_view')
+    .select('*');
+  
+  if (error) throw error;
+  return data;
+};
+
 export const signUp = async (email: string, password: string) => {
   return await supabase.auth.signUp({
     email,
@@ -148,6 +157,17 @@ export const addFriend = async (userId: string, friendId: string, intendToBump: 
     .insert([
       { user_id: userId, friend_id: friendId, intend_to_bump: intendToBump }
     ]);
+  
+  if (error) throw error;
+  return data;
+};
+
+export const findUserByEmail = async (email: string) => {
+  const { data, error } = await supabase
+    .from('users_view')
+    .select('*')
+    .eq('email', email)
+    .single();
   
   if (error) throw error;
   return data;
