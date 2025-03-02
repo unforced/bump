@@ -64,10 +64,12 @@ const TestNotificationButton = styled.button`
   color: white;
   border: none;
   border-radius: 8px;
-  padding: 8px 16px;
-  font-size: 14px;
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: bold;
   cursor: pointer;
-  margin-top: 10px;
+  margin-top: 20px;
+  margin-bottom: 20px;
   transition: all 0.3s ease;
   
   &:hover {
@@ -221,11 +223,19 @@ const Home: React.FC = () => {
   }, {});
 
   const sendTestNotification = () => {
+    console.log('Sending test notification');
+    
+    // Create a notification with current timestamp to ensure uniqueness
+    const timestamp = new Date().toISOString();
+    
     addNotification({
       title: 'Test Notification',
-      message: 'This is a test notification to demonstrate the notification system!',
+      message: `This is a test notification sent at ${timestamp}`,
       type: 'system'
     });
+    
+    // Also show an alert to confirm the button was clicked
+    alert('Test notification sent! Check the notification bell in the top right corner.');
   };
 
   return (

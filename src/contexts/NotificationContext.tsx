@@ -52,10 +52,17 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   }, [user]);
 
   const addNotification = (notification: Omit<Notification, 'id' | 'timestamp' | 'read'>) => {
-    // Don't add notifications if Do Not Disturb is on
-    if (doNotDisturb) return;
+    console.log('Adding notification:', notification);
     
+    // Don't add notifications if Do Not Disturb is on
+    if (doNotDisturb) {
+      console.log('Do Not Disturb is on, not adding notification');
+      return;
+    }
+    
+    // TEMPORARILY DISABLED FOR TESTING
     // Don't add notifications if outside availability hours
+    /*
     if (settings) {
       const now = new Date();
       const currentHour = now.getHours();
@@ -70,8 +77,21 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       
       const isWithinAvailability = currentTime >= startTime && currentTime <= endTime;
       
-      if (!isWithinAvailability) return;
+      console.log('Availability check:', { 
+        currentTime, 
+        startTime, 
+        endTime, 
+        isWithinAvailability,
+        availabilityStart: settings.availability_start,
+        availabilityEnd: settings.availability_end
+      });
+      
+      if (!isWithinAvailability) {
+        console.log('Outside availability hours, not adding notification');
+        return;
+      }
     }
+    */
     
     const newNotification: Notification = {
       ...notification,
@@ -80,7 +100,12 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       read: false
     };
     
-    setNotifications(prev => [newNotification, ...prev]);
+    console.log('Adding new notification to state:', newNotification);
+    setNotifications(prev => {
+      const updated = [newNotification, ...prev];
+      console.log('Updated notifications:', updated);
+      return updated;
+    });
   };
 
   const markAsRead = (id: string) => {

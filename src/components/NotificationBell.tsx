@@ -125,6 +125,8 @@ const NotificationBell: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   
+  console.log('NotificationBell rendering with:', { notifications, unreadCount });
+  
   const toggleDropdown = () => {
     setIsOpen(!isOpen);
     if (!isOpen && unreadCount > 0) {
