@@ -24,10 +24,10 @@ const NavContainer = styled.nav`
 
 const NavList = styled.ul`
   display: flex;
-  justify-content: space-around;
+  justify-content: space-between;
   list-style: none;
   margin: 0;
-  padding: 0 5px;
+  padding: 0;
   width: 100%;
 `;
 

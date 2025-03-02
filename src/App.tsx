@@ -24,6 +24,7 @@ const AppContainer = styled.div`
   flex-direction: column;
   max-width: 100%;
   overflow-x: hidden;
+  position: relative; /* Ensure proper positioning context */
   
   @media (min-width: 768px) {
     max-width: 600px;
