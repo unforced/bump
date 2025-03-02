@@ -363,7 +363,8 @@ const PlaceForm: React.FC<PlaceFormProps> = ({ initialPlace, onSubmit, onCancel 
             else setType('other');
           }
           
-          setSearchQuery('');
+          // Keep the place name in the search bar instead of clearing it
+          setSearchQuery(place.name || '');
           setShowSuggestions(false);
           
           // Center map on the selected place
