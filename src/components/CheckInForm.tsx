@@ -6,8 +6,8 @@ import { FaMapMarkerAlt, FaUserFriends, FaUserSecret } from 'react-icons/fa';
 
 const FormContainer = styled.div`
   background-color: ${props => props.theme.colors.secondary};
-  border-radius: ${props => props.theme.borderRadius.lg};
-  padding: ${props => props.theme.spacing[5]};
+  border-radius: ${props => props.theme.radii.lg};
+  padding: ${props => props.theme.space[5]};
   box-shadow: ${props => props.theme.shadows.md};
   width: 100%;
   max-width: 500px;
@@ -15,28 +15,28 @@ const FormContainer = styled.div`
 `;
 
 const FormTitle = styled.h2`
-  margin-bottom: ${props => props.theme.spacing[4]};
+  margin-bottom: ${props => props.theme.space[4]};
   text-align: center;
   color: ${props => props.theme.colors.primary};
   font-size: ${props => props.theme.fontSizes['2xl']};
 `;
 
 const FormGroup = styled.div`
-  margin-bottom: ${props => props.theme.spacing[4]};
+  margin-bottom: ${props => props.theme.space[4]};
 `;
 
 const Label = styled.label`
   display: block;
-  margin-bottom: ${props => props.theme.spacing[2]};
+  margin-bottom: ${props => props.theme.space[2]};
   font-weight: ${props => props.theme.fontWeights.medium};
-  color: ${props => props.theme.colors.textDark};
+  color: ${props => props.theme.colors.text};
 `;
 
 const Select = styled.select`
   width: 100%;
-  padding: ${props => props.theme.spacing[3]};
-  border: 1px solid ${props => props.theme.colors.border};
-  border-radius: ${props => props.theme.borderRadius.md};
+  padding: ${props => props.theme.space[3]};
+  border: 1px solid ${props => props.theme.colors.lightGray};
+  border-radius: ${props => props.theme.radii.md};
   background-color: ${props => props.theme.colors.background};
   font-size: ${props => props.theme.fontSizes.md};
   color: ${props => props.theme.colors.text};
@@ -45,7 +45,7 @@ const Select = styled.select`
   &:focus {
     outline: none;
     border-color: ${props => props.theme.colors.primary};
-    box-shadow: 0 0 0 2px ${props => props.theme.colors.primaryLight};
+    box-shadow: 0 0 0 2px rgba(74, 124, 89, 0.2);
   }
   
   &:disabled {
@@ -56,9 +56,9 @@ const Select = styled.select`
 
 const Input = styled.input`
   width: 100%;
-  padding: ${props => props.theme.spacing[3]};
-  border: 1px solid ${props => props.theme.colors.border};
-  border-radius: ${props => props.theme.borderRadius.md};
+  padding: ${props => props.theme.space[3]};
+  border: 1px solid ${props => props.theme.colors.lightGray};
+  border-radius: ${props => props.theme.radii.md};
   font-size: ${props => props.theme.fontSizes.md};
   color: ${props => props.theme.colors.text};
   transition: all 0.3s ease;
@@ -66,23 +66,23 @@ const Input = styled.input`
   &:focus {
     outline: none;
     border-color: ${props => props.theme.colors.primary};
-    box-shadow: 0 0 0 2px ${props => props.theme.colors.primaryLight};
+    box-shadow: 0 0 0 2px rgba(74, 124, 89, 0.2);
   }
 `;
 
 const RadioGroup = styled.div`
   display: flex;
   flex-direction: column;
-  gap: ${props => props.theme.spacing[3]};
+  gap: ${props => props.theme.space[3]};
 `;
 
 const RadioOption = styled.label`
   display: flex;
   align-items: center;
-  gap: ${props => props.theme.spacing[2]};
+  gap: ${props => props.theme.space[2]};
   cursor: pointer;
-  padding: ${props => props.theme.spacing[2]};
-  border-radius: ${props => props.theme.borderRadius.md};
+  padding: ${props => props.theme.space[2]};
+  border-radius: ${props => props.theme.radii.md};
   transition: all 0.3s ease;
   
   &:hover {
@@ -108,13 +108,13 @@ const RadioIcon = styled.span`
 const ButtonGroup = styled.div`
   display: flex;
   justify-content: space-between;
-  margin-top: ${props => props.theme.spacing[5]};
+  margin-top: ${props => props.theme.space[5]};
 `;
 
 const Button = styled.button`
-  padding: ${props => props.theme.spacing[3]} ${props => props.theme.spacing[5]};
+  padding: ${props => props.theme.space[3]} ${props => props.theme.space[5]};
   border: none;
-  border-radius: ${props => props.theme.borderRadius.md};
+  border-radius: ${props => props.theme.radii.md};
   font-size: ${props => props.theme.fontSizes.md};
   font-weight: ${props => props.theme.fontWeights.medium};
   cursor: pointer;
@@ -126,7 +126,7 @@ const CancelButton = styled(Button)`
   color: ${props => props.theme.colors.text};
   
   &:hover {
-    background-color: ${props => props.theme.colors.border};
+    background-color: ${props => props.theme.colors.lightGray};
     transform: translateY(-2px);
   }
   
@@ -158,7 +158,7 @@ const LoadingSpinner = styled.div`
   border-radius: 50%;
   border-top-color: white;
   animation: spin 1s ease-in-out infinite;
-  margin-right: ${props => props.theme.spacing[2]};
+  margin-right: ${props => props.theme.space[2]};
 `;
 
 // Fallback mock data in case Supabase connection fails
