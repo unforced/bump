@@ -100,7 +100,13 @@ const getButtonSize = (size: ButtonSize, theme: any) => {
   }
 };
 
-const StyledButton = styled.button<ButtonProps>`
+// Use $-prefixed props (transient props) to prevent them from being passed to the DOM
+const StyledButton = styled.button<{
+  $variant?: ButtonVariant;
+  $size?: ButtonSize;
+  $fullWidth?: boolean;
+  $iconPosition?: 'left' | 'right';
+}>`
   display: flex;
   align-items: center;
   justify-content: center;
@@ -111,10 +117,10 @@ const StyledButton = styled.button<ButtonProps>`
   transition: all 0.2s ease;
   box-shadow: ${props => props.theme.shadows.sm};
   
-  ${props => getButtonStyles(props.variant || 'primary', props.theme)}
-  ${props => getButtonSize(props.size || 'md', props.theme)}
+  ${props => getButtonStyles(props.$variant || 'primary', props.theme)}
+  ${props => getButtonSize(props.$size || 'md', props.theme)}
   
-  width: ${props => props.fullWidth ? '100%' : 'auto'};
+  width: ${props => props.$fullWidth ? '100%' : 'auto'};
   
   &:disabled {
     opacity: 0.6;
@@ -126,7 +132,7 @@ const StyledButton = styled.button<ButtonProps>`
     box-shadow: 0 0 0 3px rgba(74, 124, 89, 0.3);
   }
   
-  ${props => props.iconPosition === 'right' && css`
+  ${props => props.$iconPosition === 'right' && css`
     flex-direction: row-reverse;
   `}
 `;
@@ -154,10 +160,10 @@ const Button: React.FC<ButtonProps> = ({
 }) => {
   return (
     <StyledButton
-      variant={variant}
-      size={size}
-      fullWidth={fullWidth}
-      iconPosition={iconPosition}
+      $variant={variant}
+      $size={size}
+      $fullWidth={fullWidth}
+      $iconPosition={iconPosition}
       disabled={isLoading || props.disabled}
       className={`${animationClass || ''} ${className || ''}`}
       {...props}
