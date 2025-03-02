@@ -191,6 +191,44 @@ const SuccessMessage = styled.div`
   text-align: center;
 `;
 
+// New styled components for statistics
+const StatsContainer = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 16px;
+  margin: 20px 0;
+  width: 100%;
+  max-width: 500px;
+`;
+
+const StatCard = styled.div`
+  background-color: var(--secondary-color);
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  flex: 1;
+  min-width: 140px;
+  text-align: center;
+  transition: transform 0.3s ease;
+  
+  &:hover {
+    transform: translateY(-5px);
+  }
+`;
+
+const StatValue = styled.div`
+  font-size: 2rem;
+  font-weight: bold;
+  color: var(--primary-color);
+  margin-bottom: 8px;
+`;
+
+const StatLabel = styled.div`
+  font-size: 0.9rem;
+  color: #666;
+`;
+
 const Meetups: React.FC = () => {
   const [meetups, setMeetups] = useState<Meetup[]>([]);
   const [places, setPlaces] = useState<Place[]>([]);
@@ -275,6 +313,54 @@ const Meetups: React.FC = () => {
       year: 'numeric'
     });
   };
+
+  // New functions for statistics
+  const getMonthlyMeetups = () => {
+    const now = new Date();
+    const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    
+    return meetups.filter(meetup => {
+      const meetupDate = new Date(meetup.timestamp);
+      return meetupDate >= firstDayOfMonth;
+    }).length;
+  };
+  
+  const getSpontaneousMeetups = () => {
+    return meetups.filter(meetup => !meetup.was_intentional).length;
+  };
+  
+  const getPlannedMeetups = () => {
+    return meetups.filter(meetup => meetup.was_intentional).length;
+  };
+  
+  const getMostVisitedPlace = () => {
+    if (meetups.length === 0) return 'None yet';
+    
+    const placeCounts: Record<string, { count: number, name: string }> = {};
+    
+    meetups.forEach(meetup => {
+      const placeId = meetup.place_id;
+      const placeName = meetup.places?.name || 'Unknown';
+      
+      if (!placeCounts[placeId]) {
+        placeCounts[placeId] = { count: 0, name: placeName };
+      }
+      
+      placeCounts[placeId].count++;
+    });
+    
+    let mostVisitedId = '';
+    let highestCount = 0;
+    
+    Object.entries(placeCounts).forEach(([id, data]) => {
+      if (data.count > highestCount) {
+        mostVisitedId = id;
+        highestCount = data.count;
+      }
+    });
+    
+    return placeCounts[mostVisitedId]?.name || 'None';
+  };
   
   return (
     <MeetupsContainer>
@@ -287,29 +373,58 @@ const Meetups: React.FC = () => {
       {loading ? (
         <LoadingSpinner />
       ) : (
-        <MeetupsList>
-          {meetups.length === 0 ? (
-            <EmptyState>
-              <h3>No meetups yet</h3>
-              <p>Log your first meetup when you bump into a friend!</p>
-            </EmptyState>
-          ) : (
-            meetups.map(meetup => (
-              <MeetupCard key={meetup.id}>
-                <MeetupHeader>
-                  <MeetupTitle>Met {meetup.friend_name}</MeetupTitle>
-                  <MeetupDate>{formatDate(meetup.timestamp)}</MeetupDate>
-                </MeetupHeader>
-                <MeetupLocation>
-                  {meetup.places?.name || 'Unknown location'}
-                </MeetupLocation>
-                <MeetupType isIntentional={meetup.was_intentional}>
-                  {meetup.was_intentional ? 'Planned' : 'Spontaneous'}
-                </MeetupType>
-              </MeetupCard>
-            ))
+        <>
+          {/* Statistics Section */}
+          {meetups.length > 0 && (
+            <StatsContainer>
+              <StatCard>
+                <StatValue>{getMonthlyMeetups()}</StatValue>
+                <StatLabel>Meetups this month</StatLabel>
+              </StatCard>
+              <StatCard>
+                <StatValue>{getSpontaneousMeetups()}</StatValue>
+                <StatLabel>Spontaneous</StatLabel>
+              </StatCard>
+              <StatCard>
+                <StatValue>{getPlannedMeetups()}</StatValue>
+                <StatLabel>Planned</StatLabel>
+              </StatCard>
+            </StatsContainer>
           )}
-        </MeetupsList>
+          
+          {meetups.length > 0 && (
+            <StatCard style={{ width: '100%', maxWidth: '500px', marginBottom: '20px' }}>
+              <StatLabel>Most visited place</StatLabel>
+              <div style={{ fontSize: '1.2rem', fontWeight: 'bold', color: 'var(--primary-color)' }}>
+                {getMostVisitedPlace()}
+              </div>
+            </StatCard>
+          )}
+          
+          <MeetupsList>
+            {meetups.length === 0 ? (
+              <EmptyState>
+                <h3>No meetups yet</h3>
+                <p>Log your first meetup when you bump into a friend!</p>
+              </EmptyState>
+            ) : (
+              meetups.map(meetup => (
+                <MeetupCard key={meetup.id}>
+                  <MeetupHeader>
+                    <MeetupTitle>Met {meetup.friend_name}</MeetupTitle>
+                    <MeetupDate>{formatDate(meetup.timestamp)}</MeetupDate>
+                  </MeetupHeader>
+                  <MeetupLocation>
+                    {meetup.places?.name || 'Unknown location'}
+                  </MeetupLocation>
+                  <MeetupType isIntentional={meetup.was_intentional}>
+                    {meetup.was_intentional ? 'Planned' : 'Spontaneous'}
+                  </MeetupType>
+                </MeetupCard>
+              ))
+            )}
+          </MeetupsList>
+        </>
       )}
       
       <LogMeetupButton onClick={() => setIsModalOpen(true)}>
