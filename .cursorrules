@@ -11,6 +11,8 @@ Please handle appropriate terminal commands as needed.
 If anything is unclear at any point, ask rather than assume.
 
 Please use supabase appropriately, creating migrations and running them as need.
+
+Before implementing any component that uses the theme, please validate that all theme properties being accessed actually exist in our theme definition.
 ---
 
 
