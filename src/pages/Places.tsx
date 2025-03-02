@@ -4,7 +4,7 @@ import { getUserPlaces, addPlace, addUserPlace, getCurrentUser } from '../servic
 import { Place, UserPlace } from '../types';
 import PlaceForm from '../components/PlaceForm';
 import Modal from '../components/Modal';
-import { FaMapMarkerAlt, FaEdit, FaTrash } from 'react-icons/fa';
+import { FaMapMarkerAlt, FaEdit } from 'react-icons/fa';
 
 const PlacesContainer = styled.div`
   padding: 20px;

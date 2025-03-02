@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
-import { User, Place, UserPlace, Status, Meetup, Friend, Settings } from '../types';
+import { Place } from '../types';
 
 // These would typically come from environment variables
 // For the MVP, we'll use import.meta.env for Vite

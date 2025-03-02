@@ -21,12 +21,6 @@ const FormGroup = styled.div`
   margin-bottom: 16px;
 `;
 
-const Label = styled.label`
-  display: block;
-  margin-bottom: 8px;
-  font-weight: 500;
-`;
-
 const ButtonGroup = styled.div`
   display: flex;
   justify-content: space-between;
