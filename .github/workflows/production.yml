@@ -57,7 +57,7 @@ jobs:
 
       # Try using secrets directly in commands
       - name: Initialize Supabase project
-        run: supabase init
+        run: supabase init --force
 
       # Link with debug flag and direct secrets reference
       - name: Link to Supabase project
