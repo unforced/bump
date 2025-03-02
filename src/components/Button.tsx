@@ -63,7 +63,7 @@ const getButtonStyles = (variant: ButtonVariant, theme: any) => {
         background-color: transparent;
         color: ${theme.colors.primary};
         border: none;
-        padding: ${theme.spacing[1]} ${theme.spacing[2]};
+        padding: ${theme.space[1]} ${theme.space[2]};
         
         &:hover:not(:disabled) {
           background-color: rgba(74, 124, 89, 0.1);
@@ -82,17 +82,17 @@ const getButtonSize = (size: ButtonSize, theme: any) => {
   switch (size) {
     case 'sm':
       return css`
-        padding: ${theme.spacing[1]} ${theme.spacing[2]};
+        padding: ${theme.space[1]} ${theme.space[2]};
         font-size: ${theme.fontSizes.xs};
       `;
     case 'md':
       return css`
-        padding: ${theme.spacing[2]} ${theme.spacing[3]};
+        padding: ${theme.space[2]} ${theme.space[3]};
         font-size: ${theme.fontSizes.sm};
       `;
     case 'lg':
       return css`
-        padding: ${theme.spacing[3]} ${theme.spacing[4]};
+        padding: ${theme.space[3]} ${theme.space[4]};
         font-size: ${theme.fontSizes.md};
       `;
     default:
@@ -104,7 +104,7 @@ const StyledButton = styled.button<ButtonProps>`
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: ${props => props.theme.spacing[2]};
+  gap: ${props => props.theme.space[2]};
   border-radius: ${props => props.theme.radii.md};
   font-weight: ${props => props.theme.fontWeights.medium};
   cursor: pointer;
