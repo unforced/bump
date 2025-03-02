@@ -4,15 +4,13 @@ Don't commit and update unless it's clear we're complete with this step; especia
 
 ALWAYS before committing, run `npm run build` and ensure there are no build errors.
 
-Below is the PRD. At the bottom is the action plan. You should be executing each step of the action plan, and when each step is completed it should be noted and committed. As the project evolves, other steps will come up along the way and these should also be noted, but it's important to hold the context of this action plan and to trakc it well using .trackind.md
+Below is the PRD. At the bottom is the action plan. You should be executing each step of the action plan, and when each step is completed it should be noted and committed. As the project evolves, other steps will come up along the way and these should also be noted, but it's important to hold the context of this action plan and to track it well using .tracking.md
 
-This app will be built using React/Vite. Please handle appropriate terminal commands as needed.
+Please handle appropriate terminal commands as needed.
 
 If anything is unclear at any point, ask rather than assume.
 
-When you are making commands in the terminal, ideally use flags like -y, so that I don't have to manually navigate the prompts.
-
-This project is using supabase for a database. Please put migrations in supabase/migrations and run them.
+Please use supabase appropriately, creating migrations and running them as need.
 ---
 
 

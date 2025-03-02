@@ -12,7 +12,7 @@ const ModalOverlay = styled.div<{ isOpen: boolean }>`
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: ${props => props.theme.zIndex.modal};
+  z-index: ${props => props.theme.zIndices.modal};
   opacity: ${props => (props.isOpen ? 1 : 0)};
   visibility: ${props => (props.isOpen ? 'visible' : 'hidden')};
   transition: opacity 0.3s ease, visibility 0.3s ease;
