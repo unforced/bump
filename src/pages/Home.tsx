@@ -149,25 +149,6 @@ const LoadingText = styled.p`
   font-size: ${props => props.theme.fontSizes.lg};
 `;
 
-const TestNotificationButton = styled.button`
-  background-color: ${props => props.theme.colors.accent};
-  color: white;
-  border: none;
-  border-radius: ${props => props.theme.radii.md};
-  padding: ${props => props.theme.space[2]} ${props => props.theme.space[4]};
-  font-size: ${props => props.theme.fontSizes.sm};
-  font-weight: ${props => props.theme.fontWeights.medium};
-  cursor: pointer;
-  margin-top: ${props => props.theme.space[5]};
-  margin-bottom: ${props => props.theme.space[5]};
-  transition: all 0.3s ease;
-  
-  &:hover {
-    background-color: ${props => props.theme.colors.accentDark};
-    transform: scale(1.05);
-  }
-`;
-
 // Fallback mock data in case Supabase connection fails
 const fallbackMockStatuses: Status[] = [
   {
@@ -327,20 +308,6 @@ const Home: React.FC = () => {
     return acc;
   }, {});
 
-  const sendTestNotification = () => {
-    // Create a notification with current timestamp to ensure uniqueness
-    const timestamp = new Date().toISOString();
-    
-    addNotification({
-      title: 'Test Notification',
-      message: `This is a test notification sent at ${timestamp}`,
-      type: 'system'
-    });
-    
-    // Also show an alert to confirm the button was clicked
-    alert('Test notification sent! Check the notification bell in the top right corner.');
-  };
-
   const renderLoading = () => (
     <LoadingContainer>
       <div className="loading-spinner"></div>
@@ -368,10 +335,6 @@ const Home: React.FC = () => {
         <Title>Bump</Title>
         <Subtitle>See where your friends are hanging out</Subtitle>
       </Header>
-      
-      <TestNotificationButton onClick={sendTestNotification} className="slide-in-right">
-        Send Test Notification
-      </TestNotificationButton>
       
       <StatusList>
         {loading ? (
