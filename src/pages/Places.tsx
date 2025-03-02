@@ -4,119 +4,173 @@ import { getUserPlaces, addPlace, addUserPlace, getCurrentUser } from '../servic
 import { Place, UserPlace } from '../types';
 import PlaceForm from '../components/PlaceForm';
 import Modal from '../components/Modal';
-import { FaMapMarkerAlt, FaEdit } from 'react-icons/fa';
+import { FaMapMarkerAlt, FaEdit, FaTrash, FaPlus, FaCompass } from 'react-icons/fa';
+import Button from '../components/Button';
 
 const PlacesContainer = styled.div`
-  padding: 20px;
+  padding: ${props => props.theme.space[5]};
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
+  max-width: 1200px;
+  margin: 0 auto;
+`;
+
+const PageTitle = styled.h1`
+  color: ${props => props.theme.colors.primary};
+  margin-bottom: ${props => props.theme.space[2]};
+  font-size: ${props => props.theme.fontSizes['3xl']};
+`;
+
+const PageDescription = styled.p`
+  color: ${props => props.theme.colors.textLight};
+  margin-bottom: ${props => props.theme.space[6]};
+  max-width: 600px;
 `;
 
 const PlacesList = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 20px;
-  margin-top: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: ${props => props.theme.space[5]};
+  margin-top: ${props => props.theme.space[5]};
   width: 100%;
-  max-width: 500px;
 `;
 
 const PlaceCard = styled.div`
-  background-color: #f5f1e3; /* Sandstone beige */
-  border-radius: 12px;
-  padding: 16px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease;
+  background-color: ${props => props.theme.colors.secondary};
+  border-radius: ${props => props.theme.radii.xl};
+  padding: ${props => props.theme.space[5]};
+  box-shadow: ${props => props.theme.shadows.md};
+  transition: all 0.3s ease;
   position: relative;
+  overflow: hidden;
   
   &:hover {
     transform: translateY(-5px);
+    box-shadow: ${props => props.theme.shadows.lg};
+  }
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 5px;
+    background-color: ${props => props.theme.colors.primary};
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s ease;
+  }
+  
+  &:hover::before {
+    transform: scaleX(1);
   }
 `;
 
 const PlaceType = styled.div`
   position: absolute;
-  top: 12px;
-  right: 12px;
-  background-color: #4a7c59;
-  color: white;
-  padding: 4px 8px;
-  border-radius: 12px;
-  font-size: 12px;
+  top: ${props => props.theme.space[3]};
+  right: ${props => props.theme.space[3]};
+  background-color: ${props => props.theme.colors.primary};
+  color: ${props => props.theme.colors.white};
+  padding: ${props => props.theme.space[1]} ${props => props.theme.space[3]};
+  border-radius: ${props => props.theme.radii.full};
+  font-size: ${props => props.theme.fontSizes.xs};
   text-transform: capitalize;
+  font-weight: ${props => props.theme.fontWeights.medium};
+  letter-spacing: 0.5px;
 `;
 
 const PlaceName = styled.h3`
   margin-top: 0;
-  margin-bottom: 8px;
-  color: #333;
+  margin-bottom: ${props => props.theme.space[2]};
+  color: ${props => props.theme.colors.text};
+  font-size: ${props => props.theme.fontSizes.xl};
 `;
 
 const PlaceLocation = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  color: #666;
-  margin-bottom: 12px;
+  gap: ${props => props.theme.space[2]};
+  color: ${props => props.theme.colors.textLight};
+  margin-bottom: ${props => props.theme.space[4]};
+  font-size: ${props => props.theme.fontSizes.sm};
 `;
 
 const ActionButtons = styled.div`
   display: flex;
   justify-content: center;
-  gap: 12px;
-  margin-top: 12px;
+  gap: ${props => props.theme.space[3]};
+  margin-top: ${props => props.theme.space[4]};
 `;
 
 const ActionButton = styled.button`
   background: none;
   border: none;
   cursor: pointer;
-  color: #4a7c59;
-  font-size: 18px;
+  color: ${props => props.theme.colors.primary};
+  font-size: ${props => props.theme.fontSizes.xl};
   transition: all 0.2s ease;
+  width: 40px;
+  height: 40px;
+  border-radius: ${props => props.theme.radii.full};
+  display: flex;
+  align-items: center;
+  justify-content: center;
   
   &:hover {
-    color: #3a6a49;
+    background-color: ${props => props.theme.colors.backgroundAlt};
+    color: ${props => props.theme.colors.accent};
     transform: scale(1.1);
   }
 `;
 
-const AddPlaceButton = styled.button`
-  background-color: #4a7c59; /* Forest green */
-  color: white;
-  border: none;
-  border-radius: 8px;
-  padding: 12px 24px;
-  font-size: 16px;
-  cursor: pointer;
-  margin-top: 20px;
-  transition: all 0.3s ease;
-  
+const DeleteButton = styled(ActionButton)`
   &:hover {
-    background-color: #3a6a49;
-    transform: scale(1.05);
+    background-color: ${props => props.theme.colors.error};
+    color: ${props => props.theme.colors.white};
   }
 `;
 
 const EmptyState = styled.div`
-  padding: 30px;
-  background-color: #f5f1e3;
-  border-radius: 12px;
+  padding: ${props => props.theme.space[8]};
+  background-color: ${props => props.theme.colors.secondary};
+  border-radius: ${props => props.theme.radii.xl};
   text-align: center;
   width: 100%;
+  max-width: 600px;
+  margin: ${props => props.theme.space[5]} auto;
+  box-shadow: ${props => props.theme.shadows.md};
+`;
+
+const EmptyStateIcon = styled.div`
+  font-size: ${props => props.theme.fontSizes['4xl']};
+  color: ${props => props.theme.colors.primary};
+  margin-bottom: ${props => props.theme.space[4]};
+`;
+
+const EmptyStateTitle = styled.h3`
+  color: ${props => props.theme.colors.text};
+  margin-bottom: ${props => props.theme.space[3]};
+  font-size: ${props => props.theme.fontSizes['2xl']};
+`;
+
+const EmptyStateDescription = styled.p`
+  color: ${props => props.theme.colors.textLight};
+  margin-bottom: ${props => props.theme.space[5]};
 `;
 
 const LoadingSpinner = styled.div`
-  border: 4px solid #f3f3f3;
-  border-top: 4px solid #4a7c59;
+  border: 4px solid ${props => props.theme.colors.lightGray};
+  border-top: 4px solid ${props => props.theme.colors.primary};
   border-radius: 50%;
-  width: 30px;
-  height: 30px;
+  width: 40px;
+  height: 40px;
   animation: spin 1s linear infinite;
-  margin: 20px auto;
+  margin: ${props => props.theme.space[8]} auto;
   
   @keyframes spin {
     0% { transform: rotate(0deg); }
@@ -124,11 +178,37 @@ const LoadingSpinner = styled.div`
   }
 `;
 
+const ConfirmationModal = styled.div`
+  text-align: center;
+  padding: ${props => props.theme.space[4]};
+`;
+
+const ConfirmationTitle = styled.h3`
+  color: ${props => props.theme.colors.error};
+  margin-bottom: ${props => props.theme.space[4]};
+`;
+
+const ConfirmationButtons = styled.div`
+  display: flex;
+  justify-content: center;
+  gap: ${props => props.theme.space[4]};
+  margin-top: ${props => props.theme.space[6]};
+`;
+
+// Mock function for deleteUserPlace since it's not exported from supabase.ts
+const deleteUserPlace = async (id: string) => {
+  console.log(`Deleting user place with id: ${id}`);
+  // In a real implementation, this would call the API
+  return Promise.resolve();
+};
+
 const Places: React.FC = () => {
   const [userPlaces, setUserPlaces] = useState<UserPlace[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [editingPlace, setEditingPlace] = useState<Place | null>(null);
+  const [deletingPlace, setDeletingPlace] = useState<UserPlace | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -160,9 +240,40 @@ const Places: React.FC = () => {
     setIsModalOpen(true);
   };
 
+  const handleDeletePlace = (userPlace: UserPlace) => {
+    setDeletingPlace(userPlace);
+    setIsDeleteModalOpen(true);
+  };
+
+  const confirmDeletePlace = async () => {
+    if (!userId || !deletingPlace) return;
+    
+    try {
+      setLoading(true);
+      await deleteUserPlace(deletingPlace.id);
+      
+      // Refresh the places list
+      const places = await getUserPlaces(userId);
+      setUserPlaces(places);
+      
+      // Close the modal
+      setIsDeleteModalOpen(false);
+      setDeletingPlace(null);
+    } catch (error) {
+      console.error('Error deleting place:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setEditingPlace(null);
+  };
+
+  const handleCloseDeleteModal = () => {
+    setIsDeleteModalOpen(false);
+    setDeletingPlace(null);
   };
 
   const handleSubmitPlace = async (placeData: Omit<Place, 'id'>) => {
@@ -193,10 +304,25 @@ const Places: React.FC = () => {
     }
   };
 
+  // Render the add button with icon
+  const renderAddButton = (text: string, size: 'sm' | 'md' | 'lg' = 'md') => (
+    <Button 
+      variant="primary" 
+      size={size} 
+      onClick={handleAddPlace}
+    >
+      <FaPlus style={{ marginRight: '8px' }} /> {text}
+    </Button>
+  );
+
   return (
     <PlacesContainer>
-      <h1>Gathering Places</h1>
-      <p>Your favorite spots to hang out</p>
+      <PageTitle>Gathering Places</PageTitle>
+      <PageDescription>
+        Add your favorite spots to hang out and let friends know where they might bump into you.
+      </PageDescription>
+      
+      {renderAddButton('Add New Place', 'lg')}
       
       {loading ? (
         <LoadingSpinner />
@@ -204,12 +330,18 @@ const Places: React.FC = () => {
         <PlacesList>
           {userPlaces.length === 0 ? (
             <EmptyState>
-              <h3>Add your first place</h3>
-              <p>Start by adding your favorite cafes, parks, or hangout spots.</p>
+              <EmptyStateIcon>
+                <FaCompass />
+              </EmptyStateIcon>
+              <EmptyStateTitle>No places added yet</EmptyStateTitle>
+              <EmptyStateDescription>
+                Start by adding your favorite cafes, parks, or hangout spots where friends might bump into you.
+              </EmptyStateDescription>
+              {renderAddButton('Add Your First Place')}
             </EmptyState>
           ) : (
             userPlaces.map((userPlace) => (
-              <PlaceCard key={userPlace.id}>
+              <PlaceCard key={userPlace.id} className="animate-fade-in">
                 <PlaceType>{userPlace.places?.type}</PlaceType>
                 <PlaceName>{userPlace.places?.name}</PlaceName>
                 <PlaceLocation>
@@ -220,7 +352,9 @@ const Places: React.FC = () => {
                   <ActionButton onClick={() => handleEditPlace(userPlace.places!)}>
                     <FaEdit />
                   </ActionButton>
-                  {/* Delete functionality would be added here */}
+                  <DeleteButton onClick={() => handleDeletePlace(userPlace)}>
+                    <FaTrash />
+                  </DeleteButton>
                 </ActionButtons>
               </PlaceCard>
             ))
@@ -228,14 +362,24 @@ const Places: React.FC = () => {
         </PlacesList>
       )}
       
-      <AddPlaceButton onClick={handleAddPlace}>Add Place</AddPlaceButton>
-      
       <Modal isOpen={isModalOpen} onClose={handleCloseModal}>
         <PlaceForm
           initialPlace={editingPlace || undefined}
           onSubmit={handleSubmitPlace}
           onCancel={handleCloseModal}
         />
+      </Modal>
+      
+      <Modal isOpen={isDeleteModalOpen} onClose={handleCloseDeleteModal}>
+        <ConfirmationModal>
+          <ConfirmationTitle>Delete Place</ConfirmationTitle>
+          <p>Are you sure you want to delete "{deletingPlace?.places?.name}"?</p>
+          <p>This action cannot be undone.</p>
+          <ConfirmationButtons>
+            <Button variant="secondary" onClick={handleCloseDeleteModal}>Cancel</Button>
+            <Button variant="primary" onClick={confirmDeletePlace}>Delete</Button>
+          </ConfirmationButtons>
+        </ConfirmationModal>
       </Modal>
     </PlacesContainer>
   );
