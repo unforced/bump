@@ -21,7 +21,7 @@ const ModalOverlay = styled.div<{ isOpen: boolean }>`
 
 const ModalContainer = styled.div<{ isOpen: boolean }>`
   background-color: ${props => props.theme.colors.background};
-  border-radius: ${props => props.theme.borderRadius.lg};
+  border-radius: ${props => props.theme.radii.lg};
   padding: ${props => props.theme.spacing[4]};
   max-width: 90%;
   max-height: 90vh;

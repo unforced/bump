@@ -5,7 +5,9 @@ export const theme = {
     primary: '#4a7c59', // Forest green
     secondary: '#f5f1e3', // Sandstone beige
     background: '#f9f7f2',
+    backgroundAlt: '#f0ece0', // Lighter sandstone for alternate backgrounds
     text: '#333333',
+    textLight: '#666666', // Lighter text for secondary content
     accent: '#d68c45', // Earthy orange
     error: '#d64545',
     success: '#4caf50',
