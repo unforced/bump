@@ -2,7 +2,8 @@ import React, { useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { FaTimes } from 'react-icons/fa';
 
-const ModalOverlay = styled.div<{ isOpen: boolean }>`
+// Using $isOpen as a transient prop (won't be passed to the DOM)
+const ModalOverlay = styled.div<{ $isOpen: boolean }>`
   position: fixed;
   top: 0;
   left: 0;
@@ -13,13 +14,13 @@ const ModalOverlay = styled.div<{ isOpen: boolean }>`
   align-items: center;
   justify-content: center;
   z-index: ${props => props.theme.zIndices.modal};
-  opacity: ${props => (props.isOpen ? 1 : 0)};
-  visibility: ${props => (props.isOpen ? 'visible' : 'hidden')};
+  opacity: ${props => (props.$isOpen ? 1 : 0)};
+  visibility: ${props => (props.$isOpen ? 'visible' : 'hidden')};
   transition: opacity 0.3s ease, visibility 0.3s ease;
   backdrop-filter: blur(3px);
 `;
 
-const ModalContainer = styled.div<{ isOpen: boolean }>`
+const ModalContainer = styled.div<{ $isOpen: boolean }>`
   background-color: ${props => props.theme.colors.background};
   border-radius: ${props => props.theme.radii.lg};
   padding: ${props => props.theme.space[4]};
@@ -28,8 +29,8 @@ const ModalContainer = styled.div<{ isOpen: boolean }>`
   overflow-y: auto;
   box-shadow: ${props => props.theme.shadows.xl};
   position: relative;
-  transform: ${props => (props.isOpen ? 'scale(1)' : 'scale(0.9)')};
-  opacity: ${props => (props.isOpen ? 1 : 0)};
+  transform: ${props => (props.$isOpen ? 'scale(1)' : 'scale(0.9)')};
+  opacity: ${props => (props.$isOpen ? 1 : 0)};
   transition: transform 0.3s ease, opacity 0.3s ease;
 `;
 
@@ -98,8 +99,8 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
   }, [isOpen, onClose]);
   
   return (
-    <ModalOverlay isOpen={isOpen} onClick={handleOverlayClick}>
-      <ModalContainer isOpen={isOpen} ref={modalRef}>
+    <ModalOverlay $isOpen={isOpen} onClick={handleOverlayClick}>
+      <ModalContainer $isOpen={isOpen} ref={modalRef}>
         <CloseButton onClick={onClose} aria-label="Close modal">
           <FaTimes />
         </CloseButton>
