@@ -30,7 +30,7 @@ export interface Status {
   privacy: 'all' | 'intended' | 'specific';
   timestamp: string;
   is_active: boolean;
-  users?: User;
+  users_view?: User;
   places?: Place;
 }
 

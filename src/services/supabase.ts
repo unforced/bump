@@ -93,7 +93,7 @@ export const getActiveStatuses = async () => {
     .from('statuses')
     .select(`
       *,
-      users:user_id(*),
+      users_view:user_id(*),
       places:place_id(*)
     `)
     .eq('is_active', true);

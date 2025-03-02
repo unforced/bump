@@ -88,18 +88,18 @@ const StatusCard: React.FC<StatusCardProps> = ({ status, onJoin }) => {
       return 'You';
     }
     
-    if (status.users?.username) {
-      return status.users.username;
+    if (status.users_view?.username) {
+      return status.users_view.username;
     }
     
     // Try to get username from metadata if available
-    const userData = status.users as any; // Type assertion to access user_metadata
+    const userData = status.users_view as any; // Type assertion to access user_metadata
     if (userData?.user_metadata?.username) {
       return userData.user_metadata.username;
     }
     
     // Fallback to email or anonymous
-    return status.users?.email?.split('@')[0] || 'Anonymous';
+    return status.users_view?.email?.split('@')[0] || 'Anonymous';
   };
   
   return (
