@@ -6,55 +6,82 @@ import FriendCard from '../components/FriendCard';
 import AddFriendForm from '../components/AddFriendForm';
 import Modal from '../components/Modal';
 import { useAuth } from '../contexts/AuthContext';
+import { useTheme } from '../contexts/ThemeContext';
 
-const FriendsContainer = styled.div`
-  padding: 20px;
+const PageContainer = styled.div`
+  padding: ${({ theme }) => theme.space[5]};
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
+  max-width: 800px;
+  margin: 0 auto;
+`;
+
+const PageTitle = styled.h1`
+  color: ${({ theme }) => theme.colors.text};
+  font-size: ${({ theme }) => theme.fontSizes['3xl']};
+  margin-bottom: ${({ theme }) => theme.space[2]};
+`;
+
+const PageDescription = styled.p`
+  color: ${({ theme }) => theme.colors.textLight};
+  font-size: ${({ theme }) => theme.fontSizes.md};
+  margin-bottom: ${({ theme }) => theme.space[6]};
+  max-width: 600px;
 `;
 
 const FriendsList = styled.div`
-  margin-top: 20px;
+  margin-top: ${({ theme }) => theme.space[5]};
   width: 100%;
-  max-width: 500px;
+  max-width: 600px;
 `;
 
 const EmptyState = styled.div`
-  background-color: var(--secondary-color);
-  border-radius: 12px;
-  padding: 20px;
-  margin-bottom: 16px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  background-color: ${({ theme }) => theme.colors.secondary};
+  border-radius: ${({ theme }) => theme.radii.lg};
+  padding: ${({ theme }) => theme.space[5]};
+  margin-bottom: ${({ theme }) => theme.space[4]};
+  box-shadow: ${({ theme }) => theme.shadows.md};
   text-align: center;
 `;
 
+const EmptyStateTitle = styled.h3`
+  color: ${({ theme }) => theme.colors.text};
+  margin-bottom: ${({ theme }) => theme.space[2]};
+`;
+
+const EmptyStateDescription = styled.p`
+  color: ${({ theme }) => theme.colors.textLight};
+  margin-bottom: ${({ theme }) => theme.space[4]};
+`;
+
 const AddFriendButton = styled.button`
-  background-color: var(--primary-color);
-  color: white;
+  background-color: ${({ theme }) => theme.colors.primary};
+  color: ${({ theme }) => theme.colors.white};
   border: none;
-  border-radius: 8px;
-  padding: 12px 24px;
-  font-size: 16px;
+  border-radius: ${({ theme }) => theme.radii.md};
+  padding: ${({ theme }) => `${theme.space[3]} ${theme.space[6]}`};
+  font-size: ${({ theme }) => theme.fontSizes.md};
+  font-weight: ${({ theme }) => theme.fontWeights.medium};
   cursor: pointer;
-  margin-top: 20px;
+  margin-top: ${({ theme }) => theme.space[5]};
   transition: all 0.3s ease;
   
   &:hover {
-    background-color: #3a6a49;
+    background-color: ${({ theme }) => theme.colors.primaryDark};
     transform: scale(1.05);
   }
 `;
 
 const LoadingSpinner = styled.div`
-  border: 4px solid #f3f3f3;
-  border-top: 4px solid var(--primary-color);
+  border: 4px solid ${({ theme }) => theme.colors.lightGray};
+  border-top: 4px solid ${({ theme }) => theme.colors.primary};
   border-radius: 50%;
-  width: 30px;
-  height: 30px;
+  width: 40px;
+  height: 40px;
   animation: spin 1s linear infinite;
-  margin: 20px auto;
+  margin: ${({ theme }) => theme.space[5]} auto;
   
   @keyframes spin {
     0% { transform: rotate(0deg); }
@@ -63,28 +90,63 @@ const LoadingSpinner = styled.div`
 `;
 
 const ErrorMessage = styled.div`
-  color: #d32f2f;
-  background-color: #ffebee;
-  padding: 12px;
-  border-radius: 8px;
-  margin-bottom: 16px;
+  color: ${({ theme }) => theme.colors.white};
+  background-color: ${({ theme }) => theme.colors.error};
+  padding: ${({ theme }) => theme.space[3]};
+  border-radius: ${({ theme }) => theme.radii.md};
+  margin-bottom: ${({ theme }) => theme.space[4]};
   width: 100%;
-  max-width: 500px;
+  max-width: 600px;
   text-align: center;
 `;
 
 const SuccessMessage = styled.div`
-  color: #2e7d32;
-  background-color: #e8f5e9;
-  padding: 12px;
-  border-radius: 8px;
-  margin-bottom: 16px;
+  color: ${({ theme }) => theme.colors.white};
+  background-color: ${({ theme }) => theme.colors.success};
+  padding: ${({ theme }) => theme.space[3]};
+  border-radius: ${({ theme }) => theme.radii.md};
+  margin-bottom: ${({ theme }) => theme.space[4]};
   width: 100%;
-  max-width: 500px;
+  max-width: 600px;
   text-align: center;
 `;
 
+const InfoCard = styled.div`
+  background-color: ${({ theme }) => theme.colors.backgroundAlt};
+  border-left: 4px solid ${({ theme }) => theme.colors.accent};
+  border-radius: ${({ theme }) => theme.radii.md};
+  padding: ${({ theme }) => theme.space[4]};
+  margin-bottom: ${({ theme }) => theme.space[5]};
+  width: 100%;
+  max-width: 600px;
+  text-align: left;
+`;
+
+const InfoTitle = styled.h3`
+  color: ${({ theme }) => theme.colors.text};
+  margin-bottom: ${({ theme }) => theme.space[2]};
+  font-size: ${({ theme }) => theme.fontSizes.lg};
+`;
+
+const InfoDescription = styled.p`
+  color: ${({ theme }) => theme.colors.text};
+  font-size: ${({ theme }) => theme.fontSizes.sm};
+  margin-bottom: ${({ theme }) => theme.space[2]};
+`;
+
+const InfoList = styled.ul`
+  margin: ${({ theme }) => theme.space[3]} 0;
+  padding-left: ${({ theme }) => theme.space[5]};
+`;
+
+const InfoListItem = styled.li`
+  margin-bottom: ${({ theme }) => theme.space[2]};
+  color: ${({ theme }) => theme.colors.text};
+  font-size: ${({ theme }) => theme.fontSizes.sm};
+`;
+
 const Friends: React.FC = () => {
+  const theme = useTheme();
   const [friends, setFriends] = useState<Friend[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -147,6 +209,11 @@ const Friends: React.FC = () => {
       
       setSuccess(`Friend added successfully`);
       setIsModalOpen(false);
+      
+      // Clear success message after 3 seconds
+      setTimeout(() => {
+        setSuccess('');
+      }, 3000);
     } catch (error) {
       console.error('Error adding friend:', error);
       setError('Failed to add friend. Please try again later.');
@@ -167,21 +234,47 @@ const Friends: React.FC = () => {
   };
 
   return (
-    <FriendsContainer>
-      <h1>Friends</h1>
-      <p>Manage your connections and bump intentions</p>
+    <PageContainer theme={theme}>
+      <PageTitle theme={theme}>Friends</PageTitle>
+      <PageDescription theme={theme}>
+        Manage your connections and set your bump intentions to increase the chances of spontaneous meetups
+      </PageDescription>
       
-      {error && <ErrorMessage>{error}</ErrorMessage>}
-      {success && <SuccessMessage>{success}</SuccessMessage>}
+      <InfoCard theme={theme}>
+        <InfoTitle theme={theme}>What is "Intend to Bump"?</InfoTitle>
+        <InfoDescription theme={theme}>
+          The "Intend to Bump" feature helps you connect with friends in a natural way. 
+          You can set your intention to bump into specific friends, which affects how you're notified about their check-ins.
+        </InfoDescription>
+        <InfoList theme={theme}>
+          <InfoListItem theme={theme}>
+            <strong>Off:</strong> You won't receive special notifications about this friend's check-ins.
+          </InfoListItem>
+          <InfoListItem theme={theme}>
+            <strong>Private:</strong> You'll be notified when this friend checks in, but they won't know you're intending to bump into them.
+          </InfoListItem>
+          <InfoListItem theme={theme}>
+            <strong>Shared:</strong> Both you and your friend will be notified of each other's check-ins, creating mutual awareness.
+          </InfoListItem>
+        </InfoList>
+        <InfoDescription theme={theme}>
+          For "Shared" to work, both you and your friend need to set the intention to "Shared".
+        </InfoDescription>
+      </InfoCard>
+      
+      {error && <ErrorMessage theme={theme}>{error}</ErrorMessage>}
+      {success && <SuccessMessage theme={theme}>{success}</SuccessMessage>}
       
       {loading ? (
-        <LoadingSpinner />
+        <LoadingSpinner theme={theme} />
       ) : (
-        <FriendsList>
+        <FriendsList theme={theme}>
           {friends.length === 0 ? (
-            <EmptyState>
-              <h3>Add your first friend</h3>
-              <p>Connect with friends to see their check-ins and set bump intentions.</p>
+            <EmptyState theme={theme}>
+              <EmptyStateTitle theme={theme}>Add your first friend</EmptyStateTitle>
+              <EmptyStateDescription theme={theme}>
+                Connect with friends to see their check-ins and set bump intentions.
+              </EmptyStateDescription>
             </EmptyState>
           ) : (
             friends.map(friend => (
@@ -195,7 +288,7 @@ const Friends: React.FC = () => {
         </FriendsList>
       )}
       
-      <AddFriendButton onClick={() => setIsModalOpen(true)}>
+      <AddFriendButton theme={theme} onClick={() => setIsModalOpen(true)}>
         Add Friend
       </AddFriendButton>
       
@@ -206,7 +299,7 @@ const Friends: React.FC = () => {
           currentUserId={user?.id || ''}
         />
       </Modal>
-    </FriendsContainer>
+    </PageContainer>
   );
 };
 

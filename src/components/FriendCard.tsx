@@ -2,19 +2,21 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { Friend } from '../types';
 import { updateIntendToBump } from '../services/supabase';
+import { useTheme } from '../contexts/ThemeContext';
 
 const Card = styled.div`
-  background-color: var(--secondary-color);
-  border-radius: 12px;
-  padding: 16px;
-  margin-bottom: 16px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  background-color: ${({ theme }) => theme.colors.secondary};
+  border-radius: ${({ theme }) => theme.radii.lg};
+  padding: ${({ theme }) => theme.space[4]};
+  margin-bottom: ${({ theme }) => theme.space[4]};
+  box-shadow: ${({ theme }) => theme.shadows.md};
   display: flex;
   flex-direction: column;
-  transition: transform 0.3s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
   
   &:hover {
     transform: translateY(-3px);
+    box-shadow: ${({ theme }) => theme.shadows.lg};
   }
 `;
 
@@ -22,7 +24,7 @@ const FriendInfoRow = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 12px;
+  margin-bottom: ${({ theme }) => theme.space[3]};
 `;
 
 const FriendInfo = styled.div`
@@ -32,45 +34,55 @@ const FriendInfo = styled.div`
 `;
 
 const FriendName = styled.h3`
-  margin: 0 0 4px 0;
-  font-size: 1.1rem;
+  margin: 0 0 ${({ theme }) => theme.space[1]} 0;
+  font-size: ${({ theme }) => theme.fontSizes.lg};
+  font-weight: ${({ theme }) => theme.fontWeights.semibold};
+  color: ${({ theme }) => theme.colors.text};
 `;
 
 const FriendEmail = styled.p`
   margin: 0;
-  font-size: 0.9rem;
-  color: #666;
+  font-size: ${({ theme }) => theme.fontSizes.sm};
+  color: ${({ theme }) => theme.colors.textLight};
 `;
 
 const IntendSection = styled.div`
-  border-top: 1px solid #eee;
-  padding-top: 12px;
-  margin-top: 8px;
+  border-top: 1px solid ${({ theme }) => theme.colors.lightGray};
+  padding-top: ${({ theme }) => theme.space[3]};
+  margin-top: ${({ theme }) => theme.space[2]};
 `;
 
 const IntendHeader = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 8px;
+  margin-bottom: ${({ theme }) => theme.space[2]};
 `;
 
 const IntendLabel = styled.span`
-  font-size: 0.9rem;
-  font-weight: 500;
+  font-size: ${({ theme }) => theme.fontSizes.sm};
+  font-weight: ${({ theme }) => theme.fontWeights.medium};
+  color: ${({ theme }) => theme.colors.text};
 `;
 
 const ToggleSelect = styled.select`
-  padding: 8px;
-  border-radius: 6px;
-  border: 1px solid #ddd;
-  background-color: white;
-  font-size: 0.9rem;
+  padding: ${({ theme }) => theme.space[2]};
+  border-radius: ${({ theme }) => theme.radii.md};
+  border: 1px solid ${({ theme }) => theme.colors.lightGray};
+  background-color: ${({ theme }) => theme.colors.white};
+  font-size: ${({ theme }) => theme.fontSizes.sm};
   cursor: pointer;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
   
   &:focus {
     outline: none;
-    border-color: var(--primary-color);
+    border-color: ${({ theme }) => theme.colors.primary};
+    box-shadow: 0 0 0 2px ${({ theme }) => `${theme.colors.primary}30`};
+  }
+  
+  &:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
   }
 `;
 
@@ -78,22 +90,42 @@ const StatusIndicator = styled.div<{ status: 'off' | 'private' | 'shared' }>`
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  margin-right: 8px;
+  margin-right: ${({ theme }) => theme.space[2]};
   background-color: ${props => 
-    props.status === 'off' ? '#ccc' : 
-    props.status === 'private' ? '#f9a825' : 
-    '#4caf50'
+    props.status === 'off' ? props.theme.colors.mediumGray : 
+    props.status === 'private' ? props.theme.colors.accent : 
+    props.theme.colors.success
   };
+  transition: background-color 0.3s ease;
 `;
 
 const StatusWrapper = styled.div`
   display: flex;
   align-items: center;
+  margin-top: ${({ theme }) => theme.space[2]};
+  padding: ${({ theme }) => theme.space[2]};
+  background-color: ${({ theme }) => theme.colors.backgroundAlt};
+  border-radius: ${({ theme }) => theme.radii.md};
 `;
 
 const StatusText = styled.span`
-  font-size: 0.9rem;
-  color: #666;
+  font-size: ${({ theme }) => theme.fontSizes.sm};
+  color: ${({ theme }) => theme.colors.text};
+`;
+
+const LoadingSpinner = styled.div`
+  width: 16px;
+  height: 16px;
+  border: 2px solid ${({ theme }) => theme.colors.lightGray};
+  border-top: 2px solid ${({ theme }) => theme.colors.primary};
+  border-radius: 50%;
+  margin-left: ${({ theme }) => theme.space[2]};
+  animation: spin 1s linear infinite;
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
 `;
 
 interface FriendCardProps {
@@ -102,6 +134,7 @@ interface FriendCardProps {
 }
 
 const FriendCard: React.FC<FriendCardProps> = ({ friend, onUpdate }) => {
+  const theme = useTheme();
   const [intendToBump, setIntendToBump] = useState(friend.intend_to_bump);
   const [isUpdating, setIsUpdating] = useState(false);
   
@@ -152,18 +185,19 @@ const FriendCard: React.FC<FriendCardProps> = ({ friend, onUpdate }) => {
   };
   
   return (
-    <Card>
-      <FriendInfoRow>
+    <Card theme={theme}>
+      <FriendInfoRow theme={theme}>
         <FriendInfo>
-          <FriendName>{getFriendName()}</FriendName>
-          <FriendEmail>{friend.users_view?.email}</FriendEmail>
+          <FriendName theme={theme}>{getFriendName()}</FriendName>
+          <FriendEmail theme={theme}>{friend.users_view?.email}</FriendEmail>
         </FriendInfo>
       </FriendInfoRow>
       
-      <IntendSection>
-        <IntendHeader>
-          <IntendLabel>Intend to Bump</IntendLabel>
+      <IntendSection theme={theme}>
+        <IntendHeader theme={theme}>
+          <IntendLabel theme={theme}>Intend to Bump</IntendLabel>
           <ToggleSelect 
+            theme={theme}
             value={intendToBump} 
             onChange={handleIntendChange}
             disabled={isUpdating}
@@ -174,9 +208,10 @@ const FriendCard: React.FC<FriendCardProps> = ({ friend, onUpdate }) => {
           </ToggleSelect>
         </IntendHeader>
         
-        <StatusWrapper>
-          <StatusIndicator status={intendToBump} />
-          <StatusText>{getStatusText(intendToBump)}</StatusText>
+        <StatusWrapper theme={theme}>
+          <StatusIndicator theme={theme} status={intendToBump} />
+          <StatusText theme={theme}>{getStatusText(intendToBump)}</StatusText>
+          {isUpdating && <LoadingSpinner theme={theme} />}
         </StatusWrapper>
       </IntendSection>
     </Card>

@@ -1,64 +1,69 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import UserSelector from './UserSelector';
+import { useTheme } from '../contexts/ThemeContext';
 
 const FormContainer = styled.div`
-  background-color: var(--secondary-color);
-  border-radius: 12px;
-  padding: 20px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  background-color: ${({ theme }) => theme.colors.secondary};
+  border-radius: ${({ theme }) => theme.radii.lg};
+  padding: ${({ theme }) => theme.space[5]};
+  box-shadow: ${({ theme }) => theme.shadows.md};
   width: 100%;
   max-width: 500px;
   margin: 0 auto;
 `;
 
 const FormTitle = styled.h2`
-  margin-bottom: 20px;
+  margin-bottom: ${({ theme }) => theme.space[5]};
   text-align: center;
+  color: ${({ theme }) => theme.colors.text};
+  font-weight: ${({ theme }) => theme.fontWeights.semibold};
 `;
 
 const FormGroup = styled.div`
-  margin-bottom: 16px;
+  margin-bottom: ${({ theme }) => theme.space[4]};
 `;
 
 const ButtonGroup = styled.div`
   display: flex;
   justify-content: space-between;
-  margin-top: 24px;
+  margin-top: ${({ theme }) => theme.space[6]};
 `;
 
 const Button = styled.button`
-  padding: 12px 24px;
+  padding: ${({ theme }) => `${theme.space[3]} ${theme.space[6]}`};
   border: none;
-  border-radius: 8px;
-  font-size: 16px;
+  border-radius: ${({ theme }) => theme.radii.md};
+  font-size: ${({ theme }) => theme.fontSizes.md};
+  font-weight: ${({ theme }) => theme.fontWeights.medium};
   cursor: pointer;
   transition: all 0.3s ease;
 `;
 
 const CancelButton = styled(Button)`
-  background-color: #f1f1f1;
-  color: #333;
+  background-color: ${({ theme }) => theme.colors.lightGray};
+  color: ${({ theme }) => theme.colors.text};
   
   &:hover {
-    background-color: #e1e1e1;
+    background-color: ${({ theme }) => theme.colors.mediumGray};
+    color: ${({ theme }) => theme.colors.white};
   }
 `;
 
 const SubmitButton = styled(Button)`
-  background-color: var(--primary-color);
-  color: white;
+  background-color: ${({ theme }) => theme.colors.primary};
+  color: ${({ theme }) => theme.colors.white};
   
   &:hover {
-    background-color: #3a6a49;
+    background-color: ${({ theme }) => theme.colors.primaryDark};
     transform: scale(1.05);
   }
 `;
 
 const ErrorMessage = styled.p`
-  color: #d32f2f;
-  font-size: 14px;
-  margin-top: 4px;
+  color: ${({ theme }) => theme.colors.error};
+  font-size: ${({ theme }) => theme.fontSizes.sm};
+  margin-top: ${({ theme }) => theme.space[1]};
 `;
 
 interface AddFriendFormProps {
@@ -68,6 +73,7 @@ interface AddFriendFormProps {
 }
 
 const AddFriendForm: React.FC<AddFriendFormProps> = ({ onClose, onSubmit, currentUserId }) => {
+  const theme = useTheme();
   const [friendId, setFriendId] = useState('');
   const [error, setError] = useState('');
   
@@ -83,23 +89,23 @@ const AddFriendForm: React.FC<AddFriendFormProps> = ({ onClose, onSubmit, curren
   };
   
   return (
-    <FormContainer>
-      <FormTitle>Add Friend</FormTitle>
+    <FormContainer theme={theme}>
+      <FormTitle theme={theme}>Add Friend</FormTitle>
       <form onSubmit={handleSubmit}>
-        <FormGroup>
+        <FormGroup theme={theme}>
           <UserSelector 
             onSelect={setFriendId} 
             excludeIds={[currentUserId]} 
             label="Select a user to add as a friend"
           />
-          {error && <ErrorMessage>{error}</ErrorMessage>}
+          {error && <ErrorMessage theme={theme}>{error}</ErrorMessage>}
         </FormGroup>
         
-        <ButtonGroup>
-          <CancelButton type="button" onClick={onClose}>
+        <ButtonGroup theme={theme}>
+          <CancelButton theme={theme} type="button" onClick={onClose}>
             Cancel
           </CancelButton>
-          <SubmitButton type="submit">
+          <SubmitButton theme={theme} type="submit">
             Add Friend
           </SubmitButton>
         </ButtonGroup>
