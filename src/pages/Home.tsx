@@ -174,7 +174,6 @@ const Home: React.FC = () => {
         schema: 'public', 
         table: 'statuses' 
       }, (payload: any) => {
-        console.log('Status change received!', payload);
         fetchStatuses();
       })
       .subscribe();
@@ -223,8 +222,6 @@ const Home: React.FC = () => {
   }, {});
 
   const sendTestNotification = () => {
-    console.log('Sending test notification');
-    
     // Create a notification with current timestamp to ensure uniqueness
     const timestamp = new Date().toISOString();
     

@@ -52,11 +52,8 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   }, [user]);
 
   const addNotification = (notification: Omit<Notification, 'id' | 'timestamp' | 'read'>) => {
-    console.log('Adding notification:', notification);
-    
     // Don't add notifications if Do Not Disturb is on
     if (doNotDisturb) {
-      console.log('Do Not Disturb is on, not adding notification');
       return;
     }
     
@@ -77,17 +74,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       
       const isWithinAvailability = currentTime >= startTime && currentTime <= endTime;
       
-      console.log('Availability check:', { 
-        currentTime, 
-        startTime, 
-        endTime, 
-        isWithinAvailability,
-        availabilityStart: settings.availability_start,
-        availabilityEnd: settings.availability_end
-      });
-      
       if (!isWithinAvailability) {
-        console.log('Outside availability hours, not adding notification');
         return;
       }
     }
@@ -100,12 +87,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       read: false
     };
     
-    console.log('Adding new notification to state:', newNotification);
-    setNotifications(prev => {
-      const updated = [newNotification, ...prev];
-      console.log('Updated notifications:', updated);
-      return updated;
-    });
+    setNotifications(prev => [newNotification, ...prev]);
   };
 
   const markAsRead = (id: string) => {
