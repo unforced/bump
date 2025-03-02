@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
-import { getMeetups, logMeetup, getUserPlaces } from '../services/supabase';
-import { Meetup, Place } from '../types';
+import { getMeetups, logMeetup, getUserPlaces, getFriends } from '../services/supabase';
+import { Meetup, Place, Friend } from '../types';
 import { useAuth } from '../contexts/AuthContext';
 import { motion } from 'framer-motion';
 
@@ -364,18 +364,75 @@ const SectionTitle = styled.h2`
   }
 `;
 
+const AutocompleteContainer = styled.div`
+  position: relative;
+  width: 100%;
+`;
+
+const SuggestionsList = styled.ul<{ $visible: boolean }>`
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  max-height: 200px;
+  overflow-y: auto;
+  background-color: ${({ theme }) => theme.colors.background};
+  border: 1px solid ${({ theme }) => theme.colors.border};
+  border-top: none;
+  border-radius: 0 0 ${({ theme }) => theme.radii.md} ${({ theme }) => theme.radii.md};
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  z-index: ${({ theme }) => theme.zIndices.dropdown};
+  display: ${({ $visible }) => ($visible ? 'block' : 'none')};
+  box-shadow: ${({ theme }) => theme.shadows.md};
+`;
+
+const SuggestionItem = styled.li`
+  padding: ${({ theme }) => theme.space[3]};
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  
+  &:hover {
+    background-color: ${({ theme }) => theme.colors.backgroundAlt};
+  }
+`;
+
+const FriendAvatar = styled.div`
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background-color: ${({ theme }) => theme.colors.primary}40;
+  color: ${({ theme }) => theme.colors.primary};
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: ${({ theme }) => theme.space[2]};
+  font-size: ${({ theme }) => theme.fontSizes.sm};
+  font-weight: ${({ theme }) => theme.fontWeights.bold};
+`;
+
+const SuggestionContent = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
 const Meetups: React.FC = () => {
   const { user } = useAuth();
   const [meetups, setMeetups] = useState<Meetup[]>([]);
   const [places, setPlaces] = useState<Place[]>([]);
+  const [friends, setFriends] = useState<Friend[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [friendName, setFriendName] = useState('');
+  const [filteredFriends, setFilteredFriends] = useState<Friend[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
   const [placeId, setPlaceId] = useState('');
   const [wasIntentional, setWasIntentional] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [loading, setLoading] = useState(true);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -391,6 +448,10 @@ const Meetups: React.FC = () => {
         // Fetch meetups
         const meetupsData = await getMeetups(user.id);
         setMeetups(meetupsData || []);
+        
+        // Fetch friends
+        const friendsData = await getFriends(user.id);
+        setFriends(friendsData || []);
       } catch (error) {
         console.error('Error fetching data:', error);
         setError('Failed to load data. Please try again later.');
@@ -401,6 +462,43 @@ const Meetups: React.FC = () => {
     
     fetchData();
   }, [user]);
+  
+  useEffect(() => {
+    // Filter friends based on input
+    if (friendName.trim() === '') {
+      setFilteredFriends([]);
+      return;
+    }
+    
+    const filtered = friends.filter(friend => 
+      friend.users_view?.username?.toLowerCase().includes(friendName.toLowerCase())
+    );
+    setFilteredFriends(filtered);
+  }, [friendName, friends]);
+  
+  // Close suggestions when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (inputRef.current && !inputRef.current.contains(event.target as Node)) {
+        setShowSuggestions(false);
+      }
+    };
+    
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  const handleFriendNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFriendName(e.target.value);
+    setShowSuggestions(true);
+  };
+  
+  const handleSelectFriend = (friend: Friend) => {
+    setFriendName(friend.users_view?.username || '');
+    setShowSuggestions(false);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -619,14 +717,35 @@ const Meetups: React.FC = () => {
           <Form onSubmit={handleSubmit}>
             <FormGroup>
               <Label htmlFor="friendName">Friend's Name</Label>
-              <Input
-                id="friendName"
-                type="text"
-                value={friendName}
-                onChange={(e) => setFriendName(e.target.value)}
-                placeholder="Enter your friend's name"
-                required
-              />
+              <AutocompleteContainer ref={inputRef}>
+                <Input
+                  id="friendName"
+                  type="text"
+                  value={friendName}
+                  onChange={handleFriendNameChange}
+                  onFocus={() => setShowSuggestions(true)}
+                  placeholder="Enter your friend's name"
+                  required
+                />
+                <SuggestionsList $visible={showSuggestions && filteredFriends.length > 0}>
+                  {filteredFriends.map(friend => (
+                    <SuggestionItem 
+                      key={friend.id} 
+                      onClick={() => handleSelectFriend(friend)}
+                    >
+                      <SuggestionContent>
+                        <FriendAvatar>
+                          {friend.users_view?.username?.charAt(0).toUpperCase() || '?'}
+                        </FriendAvatar>
+                        {friend.users_view?.username || 'Unknown'}
+                      </SuggestionContent>
+                    </SuggestionItem>
+                  ))}
+                </SuggestionsList>
+              </AutocompleteContainer>
+              <small style={{ color: 'var(--text-light)', marginTop: '4px', display: 'block' }}>
+                You can enter any name, even if they're not on Bump
+              </small>
             </FormGroup>
             
             <FormGroup>
