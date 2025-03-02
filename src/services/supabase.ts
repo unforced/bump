@@ -93,12 +93,29 @@ export const getActiveStatuses = async () => {
     .from('statuses')
     .select(`
       *,
-      users_view:user_id(*),
       places:place_id(*)
     `)
     .eq('is_active', true);
   
   if (error) throw error;
+  
+  // Manually fetch user data for each status
+  if (data && data.length > 0) {
+    const userIds = [...new Set(data.map(status => status.user_id))];
+    const { data: userData, error: userError } = await supabase
+      .from('users_view')
+      .select('*')
+      .in('id', userIds);
+    
+    if (userError) throw userError;
+    
+    // Attach user data to each status
+    return data.map(status => ({
+      ...status,
+      users_view: userData?.find(user => user.id === status.user_id)
+    }));
+  }
+  
   return data;
 };
 
@@ -141,13 +158,28 @@ export const checkOut = async (statusId: string) => {
 export const getFriends = async (userId: string) => {
   const { data, error } = await supabase
     .from('friends')
-    .select(`
-      *,
-      users_view:friend_id(*)
-    `)
+    .select('*')
     .eq('user_id', userId);
   
   if (error) throw error;
+  
+  // Manually fetch user data for each friend
+  if (data && data.length > 0) {
+    const friendIds = data.map(friend => friend.friend_id);
+    const { data: userData, error: userError } = await supabase
+      .from('users_view')
+      .select('*')
+      .in('id', friendIds);
+    
+    if (userError) throw userError;
+    
+    // Attach user data to each friend
+    return data.map(friend => ({
+      ...friend,
+      users_view: userData?.find(user => user.id === friend.friend_id)
+    }));
+  }
+  
   return data;
 };
 
