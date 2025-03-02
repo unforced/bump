@@ -23,15 +23,13 @@ const AppContainer = styled.div`
   padding-bottom: 70px; /* Space for the navigation bar */
   display: flex;
   flex-direction: column;
-  max-width: 100%;
+  width: 100%;
   overflow-x: hidden;
-  position: relative; /* Ensure proper positioning context */
   
   @media (min-width: 768px) {
     max-width: 600px;
     margin: 0 auto;
     box-shadow: ${props => props.theme.shadows.lg};
-    min-height: 100vh;
   }
 `;
 

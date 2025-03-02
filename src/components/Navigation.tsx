@@ -4,20 +4,18 @@ import styled from 'styled-components';
 
 const NavContainer = styled.nav`
   background-color: ${props => props.theme.colors.primary};
-  padding: 12px 0;
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
-  width: 100%;
+  width: 100vw;
   box-shadow: ${props => props.theme.shadows.md};
   z-index: ${props => props.theme.zIndices.sticky};
-  transition: transform 0.3s ease;
+  padding: 12px 0;
   
   @media (min-width: 768px) {
-    max-width: 600px;
-    left: 50%;
-    transform: translateX(-50%);
+    width: 600px;
+    left: calc(50% - 300px);
     border-radius: ${props => props.theme.radii.xl} ${props => props.theme.radii.xl} 0 0;
   }
 `;
@@ -90,7 +88,7 @@ const IconWrapper = styled.div`
 
 const Navigation: React.FC = () => {
   return (
-    <NavContainer className="slide-up">
+    <NavContainer>
       <NavList>
         <NavItem>
           <StyledNavLink to="/" end>

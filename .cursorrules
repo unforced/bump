@@ -3,6 +3,7 @@ We are building an app according to the following PRD. Create a file called .tra
 Don't commit and update unless it's clear we're complete with this step; especially if we're fixing a bug. Make sure the bug is fixed and I am satisfied before we move on.
 
 ALWAYS before committing, run `npm run build` and ensure there are no build errors.
+ALWAYS before committing, when there are any front end changes, ensure that you get my confirmation that it looks good and doesn't throw errors.
 
 Below is the PRD. At the bottom is the action plan. You should be executing each step of the action plan, and when each step is completed it should be noted and committed. As the project evolves, other steps will come up along the way and these should also be noted, but it's important to hold the context of this action plan and to track it well using .tracking.md
 
