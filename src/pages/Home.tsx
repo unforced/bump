@@ -10,7 +10,7 @@ import { useNotifications } from '../contexts/NotificationContext';
 import { FaMapMarkerAlt, FaUserFriends, FaPlus } from 'react-icons/fa';
 
 const HomeContainer = styled.div`
-  padding: ${props => props.theme.spacing[5]};
+  padding: ${props => props.theme.space[5]};
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -18,14 +18,14 @@ const HomeContainer = styled.div`
 `;
 
 const Header = styled.div`
-  margin-bottom: ${props => props.theme.spacing[6]};
+  margin-bottom: ${props => props.theme.space[6]};
   text-align: center;
 `;
 
 const Title = styled.h1`
   font-size: ${props => props.theme.fontSizes['3xl']};
   color: ${props => props.theme.colors.primary};
-  margin-bottom: ${props => props.theme.spacing[2]};
+  margin-bottom: ${props => props.theme.space[2]};
 `;
 
 const Subtitle = styled.p`
@@ -35,13 +35,13 @@ const Subtitle = styled.p`
 `;
 
 const StatusList = styled.div`
-  margin-top: ${props => props.theme.spacing[5]};
+  margin-top: ${props => props.theme.space[5]};
   width: 100%;
   max-width: 500px;
 `;
 
 const StatusGroup = styled.div`
-  margin-bottom: ${props => props.theme.spacing[6]};
+  margin-bottom: ${props => props.theme.space[6]};
   text-align: left;
   animation: fadeIn 0.5s ease-in-out;
 `;
@@ -49,9 +49,9 @@ const StatusGroup = styled.div`
 const PlaceHeading = styled.div`
   display: flex;
   align-items: center;
-  gap: ${props => props.theme.spacing[2]};
-  margin-bottom: ${props => props.theme.spacing[3]};
-  padding-bottom: ${props => props.theme.spacing[2]};
+  gap: ${props => props.theme.space[2]};
+  margin-bottom: ${props => props.theme.space[3]};
+  padding-bottom: ${props => props.theme.space[2]};
   border-bottom: 1px solid ${props => props.theme.colors.border};
 `;
 
@@ -71,25 +71,25 @@ const PlaceCount = styled.span`
   color: white;
   font-size: ${props => props.theme.fontSizes.xs};
   font-weight: ${props => props.theme.fontWeights.bold};
-  padding: ${props => props.theme.spacing[1]} ${props => props.theme.spacing[2]};
-  border-radius: ${props => props.theme.borderRadius.full};
-  margin-left: ${props => props.theme.spacing[2]};
+  padding: ${props => props.theme.space[1]} ${props => props.theme.space[2]};
+  border-radius: ${props => props.theme.radii.full};
+  margin-left: ${props => props.theme.space[2]};
 `;
 
 const CheckInButton = styled.button`
   background-color: ${props => props.theme.colors.primary};
   color: white;
   border: none;
-  border-radius: ${props => props.theme.borderRadius.lg};
-  padding: ${props => props.theme.spacing[3]} ${props => props.theme.spacing[6]};
+  border-radius: ${props => props.theme.radii.lg};
+  padding: ${props => props.theme.space[3]} ${props => props.theme.space[6]};
   font-size: ${props => props.theme.fontSizes.lg};
   font-weight: ${props => props.theme.fontWeights.medium};
   cursor: pointer;
-  margin-top: ${props => props.theme.spacing[5]};
+  margin-top: ${props => props.theme.space[5]};
   transition: all 0.3s ease;
   display: flex;
   align-items: center;
-  gap: ${props => props.theme.spacing[2]};
+  gap: ${props => props.theme.space[2]};
   box-shadow: ${props => props.theme.shadows.md};
   
   &:hover {
@@ -109,10 +109,10 @@ const PlusIcon = styled(FaPlus)`
 
 const EmptyState = styled.div`
   background-color: ${props => props.theme.colors.backgroundAlt};
-  border-radius: ${props => props.theme.borderRadius.lg};
-  padding: ${props => props.theme.spacing[5]};
+  border-radius: ${props => props.theme.radii.lg};
+  padding: ${props => props.theme.space[5]};
   text-align: center;
-  margin-top: ${props => props.theme.spacing[5]};
+  margin-top: ${props => props.theme.space[5]};
   box-shadow: ${props => props.theme.shadows.md};
   border: 1px dashed ${props => props.theme.colors.border};
 `;
@@ -120,19 +120,19 @@ const EmptyState = styled.div`
 const EmptyStateIcon = styled(FaUserFriends)`
   font-size: 48px;
   color: ${props => props.theme.colors.primary};
-  margin-bottom: ${props => props.theme.spacing[3]};
+  margin-bottom: ${props => props.theme.space[3]};
   opacity: 0.7;
 `;
 
 const EmptyStateTitle = styled.h3`
   font-size: ${props => props.theme.fontSizes.xl};
   color: ${props => props.theme.colors.textDark};
-  margin-bottom: ${props => props.theme.spacing[2]};
+  margin-bottom: ${props => props.theme.space[2]};
 `;
 
 const EmptyStateText = styled.p`
   color: ${props => props.theme.colors.textLight};
-  margin-bottom: ${props => props.theme.spacing[4]};
+  margin-bottom: ${props => props.theme.space[4]};
 `;
 
 const LoadingContainer = styled.div`
@@ -140,11 +140,11 @@ const LoadingContainer = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: ${props => props.theme.spacing[6]};
+  padding: ${props => props.theme.space[6]};
 `;
 
 const LoadingText = styled.p`
-  margin-top: ${props => props.theme.spacing[4]};
+  margin-top: ${props => props.theme.space[4]};
   color: ${props => props.theme.colors.textLight};
   font-size: ${props => props.theme.fontSizes.lg};
 `;
@@ -153,13 +153,13 @@ const TestNotificationButton = styled.button`
   background-color: ${props => props.theme.colors.accent};
   color: white;
   border: none;
-  border-radius: ${props => props.theme.borderRadius.md};
-  padding: ${props => props.theme.spacing[2]} ${props => props.theme.spacing[4]};
+  border-radius: ${props => props.theme.radii.md};
+  padding: ${props => props.theme.space[2]} ${props => props.theme.space[4]};
   font-size: ${props => props.theme.fontSizes.sm};
   font-weight: ${props => props.theme.fontWeights.medium};
   cursor: pointer;
-  margin-top: ${props => props.theme.spacing[5]};
-  margin-bottom: ${props => props.theme.spacing[5]};
+  margin-top: ${props => props.theme.space[5]};
+  margin-bottom: ${props => props.theme.space[5]};
   transition: all 0.3s ease;
   
   &:hover {
