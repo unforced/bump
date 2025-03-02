@@ -12,10 +12,14 @@ If anything is unclear at any point, ask rather than assume.
 
 Please use supabase appropriately, creating migrations and running them as need.
 
+Please create a TypeScript interface for our theme object and use it consistently across all components.
+
 Before implementing any component that uses the theme, please validate that all theme properties being accessed actually exist in our theme definition.
+
+Create a helper function to safely access theme properties that will provide better error messages if a property doesn't exist.
+
+Before considering any feature complete, please audit all components for consistent theme property access.
 ---
-
-
 
 
 Bump - Source of Truth Document (React/Vite with Cursor)

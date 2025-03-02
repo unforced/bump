@@ -42,19 +42,6 @@ const Input = styled.input`
   }
 `;
 
-const Select = styled.select`
-  padding: ${props => props.theme.space[3]};
-  border: 1px solid ${props => props.theme.colors.lightGray};
-  border-radius: ${props => props.theme.radii.md};
-  font-size: ${props => props.theme.fontSizes.md};
-  
-  &:focus {
-    outline: none;
-    border-color: ${props => props.theme.colors.primary};
-    box-shadow: 0 0 0 2px rgba(74, 124, 89, 0.2);
-  }
-`;
-
 const MapContainer = styled.div`
   height: 300px;
   width: 100%;
@@ -404,7 +391,7 @@ const PlaceForm: React.FC<PlaceFormProps> = ({ initialPlace, onSubmit, onCancel 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!name.trim()) {
+    if (locationMode === 'custom' && !name.trim()) {
       setError('Please enter a place name');
       return;
     }
@@ -436,33 +423,19 @@ const PlaceForm: React.FC<PlaceFormProps> = ({ initialPlace, onSubmit, onCancel 
       <FormTitle>{initialPlace ? 'Edit Place' : 'Add New Place'}</FormTitle>
       
       <form onSubmit={handleSubmit}>
-        <FormGroup>
-          <Label htmlFor="name">Place Name</Label>
-          <Input
-            id="name"
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="e.g., MycoCafe"
-          />
-          {error && <ErrorMessage>{error}</ErrorMessage>}
-        </FormGroup>
-        
-        <FormGroup>
-          <Label htmlFor="type">Place Type</Label>
-          <Select
-            id="type"
-            value={type}
-            onChange={(e) => setType(e.target.value)}
-          >
-            <option value="cafe">Cafe</option>
-            <option value="park">Park</option>
-            <option value="coworking">Coworking Space</option>
-            <option value="restaurant">Restaurant</option>
-            <option value="bar">Bar</option>
-            <option value="other">Other</option>
-          </Select>
-        </FormGroup>
+        {locationMode === 'custom' && (
+          <FormGroup>
+            <Label htmlFor="name">Place Name</Label>
+            <Input
+              id="name"
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="e.g., MycoCafe"
+            />
+            {error && <ErrorMessage>{error}</ErrorMessage>}
+          </FormGroup>
+        )}
         
         <FormGroup>
           <Label>Location</Label>
@@ -527,6 +500,7 @@ const PlaceForm: React.FC<PlaceFormProps> = ({ initialPlace, onSubmit, onCancel 
                   <CustomLocationButton onClick={() => {
                     setLocationMode('custom');
                     setShowSuggestions(false);
+                    setName(searchQuery);
                   }}>
                     <FaPlus /> Add "{searchQuery}" as a custom location
                   </CustomLocationButton>
@@ -551,17 +525,19 @@ const PlaceForm: React.FC<PlaceFormProps> = ({ initialPlace, onSubmit, onCancel 
             <FaLocationArrow /> Use My Current Location
           </Button>
           
-          <MapContainer>
-            <GoogleMap
-              mapContainerStyle={mapContainerStyle}
-              center={position}
-              zoom={13}
-              onClick={handleMapClick}
-              onLoad={onMapLoad}
-            >
-              <Marker position={position} />
-            </GoogleMap>
-          </MapContainer>
+          {locationMode === 'custom' && (
+            <MapContainer>
+              <GoogleMap
+                mapContainerStyle={mapContainerStyle}
+                center={position}
+                zoom={13}
+                onClick={handleMapClick}
+                onLoad={onMapLoad}
+              >
+                <Marker position={position} />
+              </GoogleMap>
+            </MapContainer>
+          )}
         </FormGroup>
         
         <ButtonGroup>

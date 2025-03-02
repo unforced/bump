@@ -69,20 +69,6 @@ const PlaceCard = styled.div`
   }
 `;
 
-const PlaceType = styled.div`
-  position: absolute;
-  top: ${props => props.theme.space[3]};
-  right: ${props => props.theme.space[3]};
-  background-color: ${props => props.theme.colors.primary};
-  color: ${props => props.theme.colors.white};
-  padding: ${props => props.theme.space[1]} ${props => props.theme.space[3]};
-  border-radius: ${props => props.theme.radii.full};
-  font-size: ${props => props.theme.fontSizes.xs};
-  text-transform: capitalize;
-  font-weight: ${props => props.theme.fontWeights.medium};
-  letter-spacing: 0.5px;
-`;
-
 const PlaceName = styled.h3`
   margin-top: 0;
   margin-bottom: ${props => props.theme.space[2]};
@@ -402,7 +388,6 @@ const Places: React.FC = () => {
               
               return (
                 <PlaceCard key={userPlace.id} className="animate-fade-in">
-                  {place.type && <PlaceType>{place.type}</PlaceType>}
                   <PlaceName>{place.name || 'Unnamed Place'}</PlaceName>
                   <PlaceLocation>
                     <FaMapMarkerAlt />
