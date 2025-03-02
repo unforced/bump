@@ -49,17 +49,17 @@ const getInputSize = (size: InputSize, theme: any) => {
   switch (size) {
     case 'sm':
       return css`
-        padding: ${theme.spacing[1]} ${theme.spacing[2]};
+        padding: ${theme.space[1]} ${theme.space[2]};
         font-size: ${theme.fontSizes.xs};
       `;
     case 'md':
       return css`
-        padding: ${theme.spacing[2]} ${theme.spacing[3]};
+        padding: ${theme.space[2]} ${theme.space[3]};
         font-size: ${theme.fontSizes.sm};
       `;
     case 'lg':
       return css`
-        padding: ${theme.spacing[3]} ${theme.spacing[4]};
+        padding: ${theme.space[3]} ${theme.space[4]};
         font-size: ${theme.fontSizes.md};
       `;
     default:
@@ -116,12 +116,12 @@ const getInputVariant = (variant: InputVariant, theme: any, error: boolean) => {
 const InputContainer = styled.div<InputContainerProps>`
   display: flex;
   flex-direction: column;
-  margin-bottom: ${props => props.theme.spacing[3]};
+  margin-bottom: ${props => props.theme.space[3]};
   width: ${props => props.$fullWidth ? '100%' : 'auto'};
 `;
 
 const InputLabel = styled.label<InputLabelProps>`
-  margin-bottom: ${props => props.theme.spacing[1]};
+  margin-bottom: ${props => props.theme.space[1]};
   font-size: ${props => props.theme.fontSizes.sm};
   font-weight: ${props => props.theme.fontWeights.medium};
   color: ${props => props.$error ? props.theme.colors.error : props.theme.colors.text};
@@ -148,11 +148,11 @@ const StyledInput = styled.input<StyledInputProps>`
   }
   
   ${props => props.$hasIcon && props.$iconPosition === 'left' && css`
-    padding-left: ${props.theme.spacing[8]};
+    padding-left: ${props.theme.space[8]};
   `}
   
   ${props => props.$hasIcon && props.$iconPosition === 'right' && css`
-    padding-right: ${props.theme.spacing[8]};
+    padding-right: ${props.theme.space[8]};
   `}
 `;
 
@@ -168,7 +168,7 @@ const IconWrapper = styled.div<IconWrapperProps>`
 `;
 
 const HelperText = styled.p<HelperTextProps>`
-  margin-top: ${props => props.theme.spacing[1]};
+  margin-top: ${props => props.theme.space[1]};
   font-size: ${props => props.theme.fontSizes.xs};
   color: ${props => props.$error ? props.theme.colors.error : props.theme.colors.gray[500]};
 `;

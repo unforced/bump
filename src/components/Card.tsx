@@ -28,15 +28,15 @@ const getCardPadding = (padding: CardPadding, theme: any) => {
       `;
     case 'sm':
       return css`
-        padding: ${theme.spacing[2]};
+        padding: ${theme.space[2]};
       `;
     case 'md':
       return css`
-        padding: ${theme.spacing[4]};
+        padding: ${theme.space[4]};
       `;
     case 'lg':
       return css`
-        padding: ${theme.spacing[6]};
+        padding: ${theme.space[6]};
       `;
     default:
       return css``;
@@ -92,20 +92,20 @@ const StyledCard = styled.div<Omit<CardProps, 'children' | 'animationClass'>>`
 `;
 
 const StyledCardHeader = styled.div`
-  padding: ${props => props.theme.spacing[3]} ${props => props.theme.spacing[4]};
+  padding: ${props => props.theme.space[3]} ${props => props.theme.space[4]};
   border-bottom: 1px solid ${props => props.theme.colors.gray[200]};
   font-weight: ${props => props.theme.fontWeights.semibold};
   font-size: ${props => props.theme.fontSizes.lg};
 `;
 
 const StyledCardFooter = styled.div`
-  padding: ${props => props.theme.spacing[3]} ${props => props.theme.spacing[4]};
+  padding: ${props => props.theme.space[3]} ${props => props.theme.space[4]};
   border-top: 1px solid ${props => props.theme.colors.gray[200]};
   background-color: ${props => props.theme.colors.gray[50]};
 `;
 
 const StyledCardContent = styled.div`
-  padding: ${props => props.theme.spacing[4]};
+  padding: ${props => props.theme.space[4]};
 `;
 
 const StyledCardMedia = styled.div<{ height?: string }>`
