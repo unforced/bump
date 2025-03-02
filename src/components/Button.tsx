@@ -1,5 +1,6 @@
 import React, { ButtonHTMLAttributes } from 'react';
 import styled, { css } from 'styled-components';
+import { Theme } from '../styles/theme';
 
 type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'text';
 type ButtonSize = 'sm' | 'md' | 'lg';
@@ -14,7 +15,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   animationClass?: string;
 }
 
-const getButtonStyles = (variant: ButtonVariant, theme: any) => {
+const getButtonStyles = (variant: ButtonVariant, theme: Theme) => {
   switch (variant) {
     case 'primary':
       return css`
@@ -78,7 +79,7 @@ const getButtonStyles = (variant: ButtonVariant, theme: any) => {
   }
 };
 
-const getButtonSize = (size: ButtonSize, theme: any) => {
+const getButtonSize = (size: ButtonSize, theme: Theme) => {
   switch (size) {
     case 'sm':
       return css`

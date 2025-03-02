@@ -1,5 +1,6 @@
 import React, { InputHTMLAttributes } from 'react';
 import styled, { css } from 'styled-components';
+import { Theme } from '../styles/theme';
 
 // Custom input sizes
 type InputSize = 'sm' | 'md' | 'lg';
@@ -45,7 +46,7 @@ interface HelperTextProps {
 }
 
 // Styling functions
-const getInputSize = (size: InputSize, theme: any) => {
+const getInputSize = (size: InputSize, theme: Theme) => {
   switch (size) {
     case 'sm':
       return css`
@@ -67,44 +68,39 @@ const getInputSize = (size: InputSize, theme: any) => {
   }
 };
 
-const getInputVariant = (variant: InputVariant, theme: any, error: boolean) => {
-  const errorColor = error ? theme.colors.error : theme.colors.gray[300];
+const getInputVariant = (variant: InputVariant, theme: Theme, error: boolean) => {
+  const borderColor = error ? theme.colors.error : theme.colors.lightGray;
   const focusBorderColor = error ? theme.colors.error : theme.colors.primary;
   
   switch (variant) {
     case 'default':
       return css`
+        border: 1px solid ${borderColor};
         background-color: ${theme.colors.white};
-        border: 1px solid ${errorColor};
         
         &:focus {
           border-color: ${focusBorderColor};
-          box-shadow: 0 0 0 3px ${error ? 'rgba(220, 38, 38, 0.1)' : 'rgba(74, 124, 89, 0.1)'};
+          box-shadow: 0 0 0 3px ${error ? 'rgba(220, 53, 69, 0.25)' : 'rgba(74, 124, 89, 0.25)'};
         }
       `;
     case 'filled':
       return css`
-        background-color: ${theme.colors.gray[100]};
-        border: 1px solid ${theme.colors.gray[100]};
+        border: 1px solid transparent;
+        background-color: ${error ? 'rgba(220, 53, 69, 0.1)' : theme.colors.backgroundAlt};
         
         &:focus {
-          background-color: ${theme.colors.white};
           border-color: ${focusBorderColor};
-          box-shadow: 0 0 0 3px ${error ? 'rgba(220, 38, 38, 0.1)' : 'rgba(74, 124, 89, 0.1)'};
-        }
-        
-        &:hover:not(:focus):not(:disabled) {
-          background-color: ${theme.colors.gray[200]};
+          background-color: ${theme.colors.white};
         }
       `;
     case 'outlined':
       return css`
+        border: 2px solid ${borderColor};
         background-color: transparent;
-        border: 2px solid ${errorColor};
         
         &:focus {
           border-color: ${focusBorderColor};
-          box-shadow: 0 0 0 2px ${error ? 'rgba(220, 38, 38, 0.1)' : 'rgba(74, 124, 89, 0.1)'};
+          box-shadow: none;
         }
       `;
     default:
@@ -134,43 +130,43 @@ const InputWrapper = styled.div`
 `;
 
 const StyledInput = styled.input<StyledInputProps>`
-  border-radius: ${props => props.theme.radii.md};
   width: 100%;
-  transition: all 0.2s ease;
+  border-radius: ${props => props.theme.radii.md};
   outline: none;
+  transition: all 0.2s ease;
   
   ${props => getInputSize(props.$size || 'md', props.theme)}
   ${props => getInputVariant(props.$variant || 'default', props.theme, !!props.$error)}
+  
+  padding-left: ${props => props.$hasIcon && props.$iconPosition === 'left' ? '2.5rem' : props.theme.space[3]};
+  padding-right: ${props => props.$hasIcon && props.$iconPosition === 'right' ? '2.5rem' : props.theme.space[3]};
+  
+  &::placeholder {
+    color: ${props => props.theme.colors.mediumGray};
+  }
   
   &:disabled {
     opacity: 0.6;
     cursor: not-allowed;
   }
-  
-  ${props => props.$hasIcon && props.$iconPosition === 'left' && css`
-    padding-left: ${props.theme.space[8]};
-  `}
-  
-  ${props => props.$hasIcon && props.$iconPosition === 'right' && css`
-    padding-right: ${props.theme.space[8]};
-  `}
 `;
 
 const IconWrapper = styled.div<IconWrapperProps>`
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  ${props => props.$position === 'left' ? 'left: 12px;' : 'right: 12px;'}
+  ${props => props.$position === 'left' ? 'left: 0.75rem;' : 'right: 0.75rem;'}
+  color: ${props => props.theme.colors.mediumGray};
   display: flex;
   align-items: center;
   justify-content: center;
-  color: ${props => props.theme.colors.gray[500]};
+  pointer-events: none;
 `;
 
-const HelperText = styled.p<HelperTextProps>`
-  margin-top: ${props => props.theme.space[1]};
+const HelperText = styled.div<HelperTextProps>`
   font-size: ${props => props.theme.fontSizes.xs};
-  color: ${props => props.$error ? props.theme.colors.error : props.theme.colors.gray[500]};
+  margin-top: ${props => props.theme.space[1]};
+  color: ${props => props.$error ? props.theme.colors.error : props.theme.colors.mediumGray};
 `;
 
 // Component implementation
@@ -189,30 +185,27 @@ const Input: React.FC<InputProps> = ({
   className,
   ...props
 }) => {
-  const displayText = error && errorText ? errorText : helperText;
-  const hasIcon = !!icon;
-  
   return (
     <InputContainer $fullWidth={fullWidth} className={animationClass}>
       {label && <InputLabel $error={error}>{label}</InputLabel>}
       <InputWrapper>
-        {icon && (
-          <IconWrapper $position={iconPosition}>
-            {icon}
-          </IconWrapper>
-        )}
+        {icon && <IconWrapper $position={iconPosition}>{icon}</IconWrapper>}
         <StyledInput
           type={type}
           $size={size}
           $variant={variant}
           $error={error}
-          $hasIcon={hasIcon}
+          $hasIcon={!!icon}
           $iconPosition={iconPosition}
           className={className}
           {...props}
         />
       </InputWrapper>
-      {displayText && <HelperText $error={error}>{displayText}</HelperText>}
+      {(error && errorText) ? (
+        <HelperText $error={true}>{errorText}</HelperText>
+      ) : helperText ? (
+        <HelperText>{helperText}</HelperText>
+      ) : null}
     </InputContainer>
   );
 };

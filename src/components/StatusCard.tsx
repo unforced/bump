@@ -82,7 +82,7 @@ const Activity = styled.div`
   margin-bottom: ${props => props.theme.space[3]};
   font-size: ${props => props.theme.fontSizes.md};
   color: ${props => props.theme.colors.text};
-  line-height: ${props => props.theme.lineHeights.relaxed};
+  line-height: 1.5;
   font-style: italic;
 `;
 

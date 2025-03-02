@@ -52,7 +52,7 @@ const PlaceHeading = styled.div`
   gap: ${props => props.theme.space[2]};
   margin-bottom: ${props => props.theme.space[3]};
   padding-bottom: ${props => props.theme.space[2]};
-  border-bottom: 1px solid ${props => props.theme.colors.border};
+  border-bottom: 1px solid ${props => props.theme.colors.lightGray};
 `;
 
 const PlaceIcon = styled(FaMapMarkerAlt)`
@@ -62,7 +62,7 @@ const PlaceIcon = styled(FaMapMarkerAlt)`
 
 const PlaceName = styled.h2`
   font-size: ${props => props.theme.fontSizes.xl};
-  color: ${props => props.theme.colors.textDark};
+  color: ${props => props.theme.colors.text};
   margin: 0;
 `;
 
@@ -114,7 +114,7 @@ const EmptyState = styled.div`
   text-align: center;
   margin-top: ${props => props.theme.space[5]};
   box-shadow: ${props => props.theme.shadows.md};
-  border: 1px dashed ${props => props.theme.colors.border};
+  border: 1px dashed ${props => props.theme.colors.lightGray};
 `;
 
 const EmptyStateIcon = styled(FaUserFriends)`
@@ -126,7 +126,7 @@ const EmptyStateIcon = styled(FaUserFriends)`
 
 const EmptyStateTitle = styled.h3`
   font-size: ${props => props.theme.fontSizes.xl};
-  color: ${props => props.theme.colors.textDark};
+  color: ${props => props.theme.colors.text};
   margin-bottom: ${props => props.theme.space[2]};
 `;
 
@@ -226,7 +226,7 @@ const Home: React.FC = () => {
         setLoading(true);
         const data = await getActiveStatuses();
         setStatuses(data || []);
-      } catch (error) {
+      } catch (_) {
         // Fallback to mock data if Supabase fails
         setStatuses(fallbackMockStatuses);
       } finally {
@@ -269,7 +269,7 @@ const Home: React.FC = () => {
         message: `You've checked in at ${statuses.find(s => s.place_id === data.placeId)?.places?.name || 'a place'}`,
         type: 'system'
       });
-    } catch (error) {
+    } catch (_) {
       // Add error notification
       addNotification({
         title: 'Check-in Failed',

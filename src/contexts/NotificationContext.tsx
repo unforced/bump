@@ -3,6 +3,10 @@ import { useAuth } from './AuthContext';
 import { getUserSettings, updateSettings } from '../services/supabase';
 import { Settings } from '../types';
 
+interface NotificationData {
+  [key: string]: string | number | boolean | null;
+}
+
 interface Notification {
   id: string;
   title: string;
@@ -10,7 +14,7 @@ interface Notification {
   timestamp: Date;
   read: boolean;
   type: 'check-in' | 'friend-request' | 'system';
-  data?: any;
+  data?: NotificationData;
 }
 
 interface NotificationContextType {

@@ -1,5 +1,6 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
+import { Theme } from '../styles/theme';
 
 type CardVariant = 'default' | 'outlined' | 'elevated';
 type CardPadding = 'none' | 'sm' | 'md' | 'lg';
@@ -20,7 +21,7 @@ interface CardMediaProps {
   children?: React.ReactNode;
 }
 
-const getCardPadding = (padding: CardPadding, theme: any) => {
+const getCardPadding = (padding: CardPadding, theme: Theme) => {
   switch (padding) {
     case 'none':
       return css`
@@ -43,41 +44,44 @@ const getCardPadding = (padding: CardPadding, theme: any) => {
   }
 };
 
-const getCardVariant = (variant: CardVariant, theme: any) => {
+const getCardVariant = (variant: CardVariant, theme: Theme) => {
   switch (variant) {
     case 'default':
       return css`
         background-color: ${theme.colors.white};
         border: none;
-        box-shadow: ${theme.shadows.sm};
       `;
     case 'outlined':
       return css`
         background-color: ${theme.colors.white};
-        border: 1px solid ${theme.colors.gray[200]};
-        box-shadow: none;
+        border: 1px solid ${theme.colors.lightGray};
       `;
     case 'elevated':
       return css`
         background-color: ${theme.colors.white};
         border: none;
-        box-shadow: ${theme.shadows.lg};
+        box-shadow: ${theme.shadows.md};
       `;
     default:
       return css``;
   }
 };
 
-const StyledCard = styled.div<Omit<CardProps, 'children' | 'animationClass'>>`
-  border-radius: ${props => props.theme.radii.lg};
+const StyledCard = styled.div<{
+  $variant: CardVariant;
+  $padding: CardPadding;
+  $fullWidth: boolean;
+  $isClickable: boolean;
+}>`
+  border-radius: ${props => props.theme.radii.md};
+  width: ${props => props.$fullWidth ? '100%' : 'auto'};
   overflow: hidden;
-  transition: all 0.3s ease;
-  width: ${props => props.fullWidth ? '100%' : 'auto'};
+  transition: all 0.2s ease;
   
-  ${props => getCardVariant(props.variant || 'default', props.theme)}
-  ${props => getCardPadding(props.padding || 'md', props.theme)}
+  ${props => getCardVariant(props.$variant, props.theme)}
+  ${props => getCardPadding(props.$padding, props.theme)}
   
-  ${props => props.onClick && css`
+  ${props => props.$isClickable && css`
     cursor: pointer;
     
     &:hover {
@@ -92,40 +96,53 @@ const StyledCard = styled.div<Omit<CardProps, 'children' | 'animationClass'>>`
 `;
 
 const StyledCardHeader = styled.div`
-  padding: ${props => props.theme.space[3]} ${props => props.theme.space[4]};
-  border-bottom: 1px solid ${props => props.theme.colors.gray[200]};
-  font-weight: ${props => props.theme.fontWeights.semibold};
-  font-size: ${props => props.theme.fontSizes.lg};
+  padding: ${props => props.theme.space[4]};
+  border-bottom: 1px solid ${props => props.theme.colors.lightGray};
+  font-weight: ${props => props.theme.fontWeights.medium};
 `;
 
 const StyledCardFooter = styled.div`
-  padding: ${props => props.theme.space[3]} ${props => props.theme.space[4]};
-  border-top: 1px solid ${props => props.theme.colors.gray[200]};
-  background-color: ${props => props.theme.colors.gray[50]};
+  padding: ${props => props.theme.space[4]};
+  border-top: 1px solid ${props => props.theme.colors.lightGray};
+  background-color: ${props => props.theme.colors.backgroundAlt};
 `;
 
 const StyledCardContent = styled.div`
   padding: ${props => props.theme.space[4]};
 `;
 
-const StyledCardMedia = styled.div<{ height?: string }>`
-  width: 100%;
-  height: ${props => props.height || '200px'};
-  background-position: center;
-  background-repeat: no-repeat;
+const StyledCardMedia = styled.div<{
+  $height?: string;
+  $backgroundImage?: string;
+}>`
+  height: ${props => props.$height || '200px'};
+  background-image: ${props => props.$backgroundImage ? `url(${props.$backgroundImage})` : 'none'};
   background-size: cover;
-  background-image: ${props => props.style?.backgroundImage || 'none'};
+  background-position: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;
 
-// Define the Card component and its subcomponents
+interface CardHeaderProps {
+  children: React.ReactNode;
+}
+
+interface CardFooterProps {
+  children: React.ReactNode;
+}
+
+interface CardContentProps {
+  children: React.ReactNode;
+}
+
 interface CardComponent extends React.FC<CardProps> {
-  Header: React.FC<React.PropsWithChildren<{}>>;
-  Footer: React.FC<React.PropsWithChildren<{}>>;
-  Content: React.FC<React.PropsWithChildren<{}>>;
+  Header: React.FC<CardHeaderProps>;
+  Footer: React.FC<CardFooterProps>;
+  Content: React.FC<CardContentProps>;
   Media: React.FC<CardMediaProps>;
 }
 
-// Create the main Card component
 const Card: CardComponent = ({
   variant = 'default',
   padding = 'md',
@@ -137,9 +154,10 @@ const Card: CardComponent = ({
 }) => {
   return (
     <StyledCard
-      variant={variant}
-      padding={padding}
-      fullWidth={fullWidth}
+      $variant={variant}
+      $padding={padding}
+      $fullWidth={fullWidth}
+      $isClickable={!!onClick}
       onClick={onClick}
       className={`${animationClass || ''} ${className || ''}`}
     >
@@ -148,30 +166,26 @@ const Card: CardComponent = ({
   );
 };
 
-// Define subcomponents
-const CardHeader: React.FC<React.PropsWithChildren<{}>> = ({ children }) => {
+const CardHeader: React.FC<CardHeaderProps> = ({ children }) => {
   return <StyledCardHeader>{children}</StyledCardHeader>;
 };
 
-const CardFooter: React.FC<React.PropsWithChildren<{}>> = ({ children }) => {
+const CardFooter: React.FC<CardFooterProps> = ({ children }) => {
   return <StyledCardFooter>{children}</StyledCardFooter>;
 };
 
-const CardContent: React.FC<React.PropsWithChildren<{}>> = ({ children }) => {
+const CardContent: React.FC<CardContentProps> = ({ children }) => {
   return <StyledCardContent>{children}</StyledCardContent>;
 };
 
 const CardMedia: React.FC<CardMediaProps> = ({ height, backgroundImage, children }) => {
-  const style = backgroundImage ? { backgroundImage: `url(${backgroundImage})` } : undefined;
-  
   return (
-    <StyledCardMedia height={height} style={style}>
+    <StyledCardMedia $height={height} $backgroundImage={backgroundImage}>
       {children}
     </StyledCardMedia>
   );
 };
 
-// Assign subcomponents to Card
 Card.Header = CardHeader;
 Card.Footer = CardFooter;
 Card.Content = CardContent;

@@ -2,6 +2,18 @@ We are building an app according to the following PRD. Create a file called .tra
 
 Don't commit and update unless it's clear we're complete with this step; especially if we're fixing a bug. Make sure the bug is fixed and I am satisfied before we move on.
 
+When you commit, give a clear title for the commit and in the commit body, give a very cohesive description of what was done in this commit.
+
+For commit messages:
+1. Use a concise but descriptive title (50-72 characters)
+2. Leave a blank line after the title
+3. Write a detailed body with each point on its own line (not using \n)
+4. Format the git commit command like this:
+   ```
+   git commit -m "Title: Brief description of changes" -m "Detailed description point 1" -m "Detailed description point 2" -m "Detailed description point 3"
+   ```
+5. Each -m flag creates a new line in the commit message
+
 ALWAYS before committing, run `npm run build` and ensure there are no build errors.
 ALWAYS before committing, when there are any front end changes, ensure that you get my confirmation that it looks good and doesn't throw errors.
 

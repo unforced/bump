@@ -192,7 +192,7 @@ const CheckInForm: React.FC<CheckInFormProps> = ({ onClose, onSubmit }) => {
         setLoading(true);
         const data = await getPlaces();
         setPlaces(data || []);
-      } catch (error) {
+      } catch (_) {
         // Fallback to mock data if Supabase fails
         setPlaces(fallbackPlaces);
       } finally {

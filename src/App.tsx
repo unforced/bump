@@ -1,52 +1,28 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import styled from 'styled-components';
-import Home from './pages/Home';
-import Places from './pages/Places';
-import Friends from './pages/Friends';
-import Meetups from './pages/Meetups';
-import Settings from './pages/Settings';
-import Login from './pages/Login';
-import FriendProfile from './pages/FriendProfile';
-import Navigation from './components/Navigation';
-import NotificationBell from './components/NotificationBell';
-import ProtectedRoute from './components/ProtectedRoute';
+import { lazy, Suspense } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import './App.css';
+import { ThemeProvider } from './contexts/ThemeContext';
 import { AuthProvider } from './contexts/AuthContext';
 import { NotificationProvider } from './contexts/NotificationContext';
-import { ThemeProvider } from './contexts/ThemeContext';
-import './App.css';
+import ProtectedRoute from './components/ProtectedRoute';
+import Navigation from './components/Navigation';
+import Layout from './components/Layout';
 
-const AppContainer = styled.div`
-  font-family: 'Inter', sans-serif;
-  color: ${props => props.theme.colors.text};
-  background-color: ${props => props.theme.colors.background};
-  min-height: 100vh;
-  padding-bottom: 70px; /* Space for the navigation bar */
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  overflow-x: hidden;
-  
-  @media (min-width: 768px) {
-    max-width: 600px;
-    margin: 0 auto;
-    box-shadow: ${props => props.theme.shadows.lg};
-  }
-`;
+// Lazy load pages to reduce initial bundle size
+const Login = lazy(() => import('./pages/Login'));
+const Home = lazy(() => import('./pages/Home'));
+const Places = lazy(() => import('./pages/Places'));
+const Friends = lazy(() => import('./pages/Friends'));
+const FriendProfile = lazy(() => import('./pages/FriendProfile'));
+const Meetups = lazy(() => import('./pages/Meetups'));
+const Settings = lazy(() => import('./pages/Settings'));
 
-const Header = styled.header`
-  display: flex;
-  justify-content: flex-end;
-  padding: 16px;
-`;
-
-const MainLayout = ({ children }: { children: React.ReactNode }) => (
-  <AppContainer className="fade-in">
-    <Header>
-      <NotificationBell />
-    </Header>
-    {children}
-    <Navigation />
-  </AppContainer>
+// Loading fallback component
+const LoadingFallback = () => (
+  <div className="loading-container">
+    <div className="loading-spinner"></div>
+    <p>Loading...</p>
+  </div>
 );
 
 function App() {
@@ -55,42 +31,57 @@ function App() {
       <AuthProvider>
         <NotificationProvider>
           <Router>
-            <Routes>
-              <Route path="/login" element={<Login />} />
-              
-              <Route element={<ProtectedRoute />}>
-                <Route path="/" element={
-                  <MainLayout>
-                    <Home />
-                  </MainLayout>
-                } />
-                <Route path="/places" element={
-                  <MainLayout>
-                    <Places />
-                  </MainLayout>
-                } />
-                <Route path="/friends" element={
-                  <MainLayout>
-                    <Friends />
-                  </MainLayout>
-                } />
-                <Route path="/friends/:friendId" element={
-                  <MainLayout>
-                    <FriendProfile />
-                  </MainLayout>
-                } />
-                <Route path="/meetups" element={
-                  <MainLayout>
-                    <Meetups />
-                  </MainLayout>
-                } />
-                <Route path="/settings" element={
-                  <MainLayout>
-                    <Settings />
-                  </MainLayout>
-                } />
-              </Route>
-            </Routes>
+            <div className="app">
+              <Suspense fallback={<LoadingFallback />}>
+                <Routes>
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/" element={
+                    <ProtectedRoute>
+                      <Layout>
+                        <Home />
+                      </Layout>
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/places" element={
+                    <ProtectedRoute>
+                      <Layout>
+                        <Places />
+                      </Layout>
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/friends" element={
+                    <ProtectedRoute>
+                      <Layout>
+                        <Friends />
+                      </Layout>
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/friends/:id" element={
+                    <ProtectedRoute>
+                      <Layout>
+                        <FriendProfile />
+                      </Layout>
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/meetups" element={
+                    <ProtectedRoute>
+                      <Layout>
+                        <Meetups />
+                      </Layout>
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/settings" element={
+                    <ProtectedRoute>
+                      <Layout>
+                        <Settings />
+                      </Layout>
+                    </ProtectedRoute>
+                  } />
+                  <Route path="*" element={<Navigate to="/" replace />} />
+                </Routes>
+              </Suspense>
+              <Navigation />
+            </div>
           </Router>
         </NotificationProvider>
       </AuthProvider>

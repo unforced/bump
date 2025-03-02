@@ -83,7 +83,7 @@ const Label = styled.label`
 const TimeInput = styled.input`
   width: 100%;
   padding: ${({ theme }) => theme.space[3]};
-  border: 1px solid ${({ theme }) => theme.colors.border};
+  border: 1px solid ${({ theme }) => theme.colors.lightGray};
   border-radius: ${({ theme }) => theme.radii.md};
   font-size: ${({ theme }) => theme.fontSizes.md};
   background-color: ${({ theme }) => theme.colors.background};
@@ -128,7 +128,7 @@ const ToggleSwitch = styled.label`
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: ${({ theme }) => theme.colors.border};
+    background-color: ${({ theme }) => theme.colors.lightGray};
     transition: .4s;
     border-radius: 34px;
     
@@ -279,7 +279,7 @@ const LoadingIndicator = styled.div`
     content: "";
     width: 40px;
     height: 40px;
-    border: 4px solid ${({ theme }) => theme.colors.border};
+    border: 4px solid ${({ theme }) => theme.colors.lightGray};
     border-top-color: ${({ theme }) => theme.colors.primary};
     border-radius: 50%;
     animation: spin 1s linear infinite;

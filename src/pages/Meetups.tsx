@@ -74,7 +74,7 @@ const MeetupCard = styled(motion.div)`
   border-radius: ${({ theme }) => theme.radii.lg};
   padding: ${({ theme }) => theme.space[4]};
   box-shadow: ${({ theme }) => theme.shadows.sm};
-  border: 1px solid ${({ theme }) => theme.colors.border};
+  border: 1px solid ${({ theme }) => theme.colors.lightGray};
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   
   &:hover {
@@ -244,7 +244,7 @@ const Label = styled.label`
 const Input = styled.input`
   width: 100%;
   padding: ${({ theme }) => theme.space[3]};
-  border: 1px solid ${({ theme }) => theme.colors.border};
+  border: 1px solid ${({ theme }) => theme.colors.lightGray};
   border-radius: ${({ theme }) => theme.radii.md};
   font-size: ${({ theme }) => theme.fontSizes.md};
   background-color: ${({ theme }) => theme.colors.background};
@@ -260,7 +260,7 @@ const Input = styled.input`
 const Select = styled.select`
   width: 100%;
   padding: ${({ theme }) => theme.space[3]};
-  border: 1px solid ${({ theme }) => theme.colors.border};
+  border: 1px solid ${({ theme }) => theme.colors.lightGray};
   border-radius: ${({ theme }) => theme.radii.md};
   font-size: ${({ theme }) => theme.fontSizes.md};
   background-color: ${({ theme }) => theme.colors.background};
@@ -298,7 +298,7 @@ const SubmitButton = styled.button`
   }
   
   &:disabled {
-    background-color: ${({ theme }) => theme.colors.border};
+    background-color: ${({ theme }) => theme.colors.lightGray};
     cursor: not-allowed;
   }
 `;
@@ -331,7 +331,7 @@ const LoadingIndicator = styled.div`
     content: "";
     width: 40px;
     height: 40px;
-    border: 4px solid ${({ theme }) => theme.colors.border};
+    border: 4px solid ${({ theme }) => theme.colors.lightGray};
     border-top-color: ${({ theme }) => theme.colors.primary};
     border-radius: 50%;
     animation: spin 1s linear infinite;
@@ -377,7 +377,7 @@ const SuggestionsList = styled.ul<{ $visible: boolean }>`
   max-height: 200px;
   overflow-y: auto;
   background-color: ${({ theme }) => theme.colors.background};
-  border: 1px solid ${({ theme }) => theme.colors.border};
+  border: 1px solid ${({ theme }) => theme.colors.lightGray};
   border-top: none;
   border-radius: 0 0 ${({ theme }) => theme.radii.md} ${({ theme }) => theme.radii.md};
   list-style: none;

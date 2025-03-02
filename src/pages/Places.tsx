@@ -265,10 +265,10 @@ const InfoWindowButton = styled.button`
 `;
 
 const InfoWindowDeleteButton = styled(InfoWindowButton)`
-  background-color: ${props => props.theme.colors.error};
+  background-color: #c82333;
   
   &:hover {
-    background-color: ${props => props.theme.colors.errorDark || '#c82333'};
+    background-color: #a71d2a;
   }
 `;
 
