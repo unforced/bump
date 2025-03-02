@@ -310,10 +310,16 @@ const Settings: React.FC = () => {
     if (settings) {
       setAvailabilityStart(settings.availability_start);
       setAvailabilityEnd(settings.availability_end);
-      setNotifyFor(settings.notify_for);
+      
+      // Only update notifyFor if it hasn't been manually changed by the user
+      // or if this is the initial load (loading is true)
+      if (loading) {
+        setNotifyFor(settings.notify_for);
+      }
+      
       setLoading(false);
     }
-  }, [settings]);
+  }, [settings, loading]);
   
   const handleLogout = async () => {
     try {
@@ -329,6 +335,11 @@ const Settings: React.FC = () => {
         setIsError(false);
       }, 3000);
     }
+  };
+  
+  // Handle Do Not Disturb toggle without resetting notification preferences
+  const handleToggleDoNotDisturb = () => {
+    toggleDoNotDisturb();
   };
   
   const handleSaveSettings = async () => {
@@ -467,7 +478,7 @@ const Settings: React.FC = () => {
             <input
               type="checkbox"
               checked={doNotDisturb}
-              onChange={toggleDoNotDisturb}
+              onChange={handleToggleDoNotDisturb}
             />
             <span></span>
           </ToggleSwitch>
