@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import styled from 'styled-components';
 import { getUserPlaces, addPlace, addUserPlace, getCurrentUser } from '../services/supabase';
 import { Place, UserPlace } from '../types';
 import PlaceForm from '../components/PlaceForm';
 import Modal from '../components/Modal';
-import { FaMapMarkerAlt, FaEdit, FaTrash, FaPlus, FaCompass } from 'react-icons/fa';
+import { FaMapMarkerAlt, FaEdit, FaTrash, FaPlus, FaCompass, FaList, FaMap } from 'react-icons/fa';
 import Button from '../components/Button';
+import { GoogleMap, useLoadScript, Marker, InfoWindow } from '@react-google-maps/api';
 
 const PlacesContainer = styled.div`
   padding: ${props => props.theme.space[5]};
@@ -192,6 +193,85 @@ const ErrorMessage = styled.div`
   max-width: 600px;
 `;
 
+const ViewToggleContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  margin: ${props => props.theme.space[4]} 0;
+  background-color: ${props => props.theme.colors.secondary};
+  border-radius: ${props => props.theme.radii.full};
+  padding: ${props => props.theme.space[1]};
+  width: fit-content;
+`;
+
+const ViewToggleButton = styled.button<{ $active: boolean }>`
+  background-color: ${props => props.$active ? props.theme.colors.primary : 'transparent'};
+  color: ${props => props.$active ? props.theme.colors.white : props.theme.colors.text};
+  border: none;
+  border-radius: ${props => props.theme.radii.full};
+  padding: ${props => props.theme.space[2]} ${props => props.theme.space[4]};
+  font-size: ${props => props.theme.fontSizes.md};
+  font-weight: ${props => props.theme.fontWeights.medium};
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: ${props => props.theme.space[2]};
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background-color: ${props => props.$active ? props.theme.colors.primaryDark : props.theme.colors.backgroundAlt};
+  }
+`;
+
+const MapContainer = styled.div`
+  width: 100%;
+  height: 500px;
+  border-radius: ${props => props.theme.radii.xl};
+  overflow: hidden;
+  box-shadow: ${props => props.theme.shadows.md};
+  margin-top: ${props => props.theme.space[5]};
+`;
+
+const InfoWindowContent = styled.div`
+  padding: ${props => props.theme.space[2]};
+  max-width: 200px;
+`;
+
+const InfoWindowTitle = styled.h4`
+  margin: 0 0 ${props => props.theme.space[1]} 0;
+  color: ${props => props.theme.colors.text};
+`;
+
+const InfoWindowActions = styled.div`
+  display: flex;
+  gap: ${props => props.theme.space[2]};
+  margin-top: ${props => props.theme.space[2]};
+`;
+
+const InfoWindowButton = styled.button`
+  background-color: ${props => props.theme.colors.primary};
+  color: ${props => props.theme.colors.white};
+  border: none;
+  border-radius: ${props => props.theme.radii.sm};
+  padding: ${props => props.theme.space[1]} ${props => props.theme.space[2]};
+  font-size: ${props => props.theme.fontSizes.xs};
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: ${props => props.theme.space[1]};
+  
+  &:hover {
+    background-color: ${props => props.theme.colors.primaryDark};
+  }
+`;
+
+const InfoWindowDeleteButton = styled(InfoWindowButton)`
+  background-color: ${props => props.theme.colors.error};
+  
+  &:hover {
+    background-color: ${props => props.theme.colors.errorDark || '#c82333'};
+  }
+`;
+
 // Function to delete a user place
 const deleteUserPlace = async (id: string) => {
   console.log(`Deleting user place with id: ${id}`);
@@ -208,6 +288,45 @@ const Places: React.FC = () => {
   const [editingPlace, setEditingPlace] = useState<Place | null>(null);
   const [deletingPlace, setDeletingPlace] = useState<UserPlace | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
+  const [selectedMarker, setSelectedMarker] = useState<UserPlace | null>(null);
+  
+  // Google Maps setup
+  const { isLoaded: mapsLoaded, loadError: mapsLoadError } = useLoadScript({
+    googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '',
+    libraries: ['places'] as any,
+  });
+
+  // Calculate map center based on places
+  const getMapCenter = useCallback(() => {
+    if (userPlaces.length === 0) {
+      return { lat: 40.0150, lng: -105.2705 }; // Default to Boulder, CO
+    }
+
+    // Filter places with valid coordinates
+    const placesWithCoords = userPlaces.filter(
+      up => up.places && up.places.lat && up.places.lng
+    );
+
+    if (placesWithCoords.length === 0) {
+      return { lat: 40.0150, lng: -105.2705 }; // Default to Boulder, CO
+    }
+
+    // Calculate average lat/lng
+    const sumLat = placesWithCoords.reduce(
+      (sum, up) => sum + (up.places?.lat || 0), 
+      0
+    );
+    const sumLng = placesWithCoords.reduce(
+      (sum, up) => sum + (up.places?.lng || 0), 
+      0
+    );
+
+    return {
+      lat: sumLat / placesWithCoords.length,
+      lng: sumLng / placesWithCoords.length
+    };
+  }, [userPlaces]);
 
   useEffect(() => {
     const fetchUserAndPlaces = async () => {
@@ -353,6 +472,127 @@ const Places: React.FC = () => {
     </Button>
   );
 
+  // Render map view
+  const renderMapView = () => {
+    if (!mapsLoaded) return <LoadingSpinner />;
+    if (mapsLoadError) return <ErrorMessage>Failed to load Google Maps</ErrorMessage>;
+
+    return (
+      <MapContainer>
+        <GoogleMap
+          mapContainerStyle={{ width: '100%', height: '100%' }}
+          center={getMapCenter()}
+          zoom={12}
+          options={{
+            styles: [
+              {
+                featureType: 'poi',
+                elementType: 'labels',
+                stylers: [{ visibility: 'off' }]
+              }
+            ]
+          }}
+        >
+          {userPlaces.map((userPlace) => {
+            if (!userPlace.places || !userPlace.places.lat || !userPlace.places.lng) return null;
+            
+            return (
+              <Marker
+                key={userPlace.id}
+                position={{ 
+                  lat: userPlace.places.lat, 
+                  lng: userPlace.places.lng 
+                }}
+                onClick={() => setSelectedMarker(userPlace)}
+                animation={google.maps.Animation.DROP}
+              />
+            );
+          })}
+
+          {selectedMarker && selectedMarker.places && (
+            <InfoWindow
+              position={{ 
+                lat: selectedMarker.places.lat || 0, 
+                lng: selectedMarker.places.lng || 0 
+              }}
+              onCloseClick={() => setSelectedMarker(null)}
+            >
+              <InfoWindowContent>
+                <InfoWindowTitle>{selectedMarker.places.name || 'Unnamed Place'}</InfoWindowTitle>
+                <div>{selectedMarker.places.type}</div>
+                <InfoWindowActions>
+                  <InfoWindowButton onClick={() => {
+                    setSelectedMarker(null);
+                    if (selectedMarker.places) {
+                      handleEditPlace(selectedMarker.places);
+                    }
+                  }}>
+                    <FaEdit size={12} /> Edit
+                  </InfoWindowButton>
+                  <InfoWindowDeleteButton onClick={() => {
+                    setSelectedMarker(null);
+                    handleDeletePlace(selectedMarker);
+                  }}>
+                    <FaTrash size={12} /> Delete
+                  </InfoWindowDeleteButton>
+                </InfoWindowActions>
+              </InfoWindowContent>
+            </InfoWindow>
+          )}
+        </GoogleMap>
+      </MapContainer>
+    );
+  };
+
+  // Render list view
+  const renderListView = () => {
+    if (loading) return <LoadingSpinner />;
+    
+    return (
+      <PlacesList>
+        {userPlaces.length === 0 ? (
+          <EmptyState>
+            <EmptyStateIcon>
+              <FaCompass />
+            </EmptyStateIcon>
+            <EmptyStateTitle>No places added yet</EmptyStateTitle>
+            <EmptyStateDescription>
+              Start by adding your favorite cafes, parks, or hangout spots where friends might bump into you.
+            </EmptyStateDescription>
+            {renderAddButton('Add Your First Place')}
+          </EmptyState>
+        ) : (
+          userPlaces.map((userPlace) => {
+            // Skip rendering if place data is missing
+            if (!userPlace || !userPlace.places) return null;
+            
+            const place = userPlace.places;
+            
+            return (
+              <PlaceCard key={userPlace.id} className="animate-fade-in">
+                <PlaceName>{place.name || 'Unnamed Place'}</PlaceName>
+                <PlaceLocation>
+                  <FaMapMarkerAlt />
+                  {place.lat && place.lng 
+                    ? `${place.lat.toFixed(4)}, ${place.lng.toFixed(4)}`
+                    : 'Location not specified'}
+                </PlaceLocation>
+                <ActionButtons>
+                  <ActionButton onClick={() => handleEditPlace(place)}>
+                    <FaEdit />
+                  </ActionButton>
+                  <DeleteButton onClick={() => handleDeletePlace(userPlace)}>
+                    <FaTrash />
+                  </DeleteButton>
+                </ActionButtons>
+              </PlaceCard>
+            );
+          })
+        )}
+      </PlacesList>
+    );
+  };
+
   return (
     <PlacesContainer>
       <PageTitle>Gathering Places</PageTitle>
@@ -362,53 +602,26 @@ const Places: React.FC = () => {
       
       {error && <ErrorMessage>{error}</ErrorMessage>}
       
-      {renderAddButton('Add New Place', 'lg')}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+        {renderAddButton('Add New Place', 'lg')}
+        
+        <ViewToggleContainer>
+          <ViewToggleButton 
+            $active={viewMode === 'list'} 
+            onClick={() => setViewMode('list')}
+          >
+            <FaList /> List
+          </ViewToggleButton>
+          <ViewToggleButton 
+            $active={viewMode === 'map'} 
+            onClick={() => setViewMode('map')}
+          >
+            <FaMap /> Map
+          </ViewToggleButton>
+        </ViewToggleContainer>
+      </div>
       
-      {loading ? (
-        <LoadingSpinner />
-      ) : (
-        <PlacesList>
-          {userPlaces.length === 0 ? (
-            <EmptyState>
-              <EmptyStateIcon>
-                <FaCompass />
-              </EmptyStateIcon>
-              <EmptyStateTitle>No places added yet</EmptyStateTitle>
-              <EmptyStateDescription>
-                Start by adding your favorite cafes, parks, or hangout spots where friends might bump into you.
-              </EmptyStateDescription>
-              {renderAddButton('Add Your First Place')}
-            </EmptyState>
-          ) : (
-            userPlaces.map((userPlace) => {
-              // Skip rendering if place data is missing
-              if (!userPlace || !userPlace.places) return null;
-              
-              const place = userPlace.places;
-              
-              return (
-                <PlaceCard key={userPlace.id} className="animate-fade-in">
-                  <PlaceName>{place.name || 'Unnamed Place'}</PlaceName>
-                  <PlaceLocation>
-                    <FaMapMarkerAlt />
-                    {place.lat && place.lng 
-                      ? `${place.lat.toFixed(4)}, ${place.lng.toFixed(4)}`
-                      : 'Location not specified'}
-                  </PlaceLocation>
-                  <ActionButtons>
-                    <ActionButton onClick={() => handleEditPlace(place)}>
-                      <FaEdit />
-                    </ActionButton>
-                    <DeleteButton onClick={() => handleDeletePlace(userPlace)}>
-                      <FaTrash />
-                    </DeleteButton>
-                  </ActionButtons>
-                </PlaceCard>
-              );
-            })
-          )}
-        </PlacesList>
-      )}
+      {viewMode === 'list' ? renderListView() : renderMapView()}
       
       <Modal isOpen={isModalOpen} onClose={handleCloseModal}>
         <PlaceForm

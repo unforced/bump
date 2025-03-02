@@ -6,9 +6,9 @@ import { FaMapMarkerAlt, FaUserFriends } from 'react-icons/fa';
 
 const Card = styled.div`
   background-color: ${props => props.theme.colors.secondary};
-  border-radius: ${props => props.theme.borderRadius.lg};
-  padding: ${props => props.theme.spacing[4]};
-  margin-bottom: ${props => props.theme.spacing[4]};
+  border-radius: ${props => props.theme.radii.lg};
+  padding: ${props => props.theme.space[4]};
+  margin-bottom: ${props => props.theme.space[4]};
   box-shadow: ${props => props.theme.shadows.md};
   transition: all 0.3s ease;
   border-left: 4px solid ${props => props.theme.colors.primary};
@@ -23,13 +23,13 @@ const CardHeader = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: ${props => props.theme.spacing[2]};
+  margin-bottom: ${props => props.theme.space[2]};
 `;
 
 const UserInfo = styled.div`
   display: flex;
   align-items: center;
-  gap: ${props => props.theme.spacing[2]};
+  gap: ${props => props.theme.space[2]};
 `;
 
 const UserAvatar = styled.div`
@@ -57,21 +57,21 @@ const TimeStamp = styled.span`
   font-size: ${props => props.theme.fontSizes.xs};
   color: ${props => props.theme.colors.textLight};
   background-color: ${props => props.theme.colors.backgroundAlt};
-  padding: ${props => props.theme.spacing[1]} ${props => props.theme.spacing[2]};
-  border-radius: ${props => props.theme.borderRadius.full};
+  padding: ${props => props.theme.space[1]} ${props => props.theme.space[2]};
+  border-radius: ${props => props.theme.radii.full};
 `;
 
 const StatusContent = styled.div`
-  margin: ${props => props.theme.spacing[3]} 0;
+  margin: ${props => props.theme.space[3]} 0;
 `;
 
 const PlaceInfo = styled.div`
   display: flex;
   align-items: center;
-  gap: ${props => props.theme.spacing[2]};
+  gap: ${props => props.theme.space[2]};
   font-weight: ${props => props.theme.fontWeights.medium};
-  margin-bottom: ${props => props.theme.spacing[2]};
-  color: ${props => props.theme.colors.textDark};
+  margin-bottom: ${props => props.theme.space[2]};
+  color: ${props => props.theme.colors.text};
 `;
 
 const PlaceIcon = styled(FaMapMarkerAlt)`
@@ -79,7 +79,7 @@ const PlaceIcon = styled(FaMapMarkerAlt)`
 `;
 
 const Activity = styled.div`
-  margin-bottom: ${props => props.theme.spacing[3]};
+  margin-bottom: ${props => props.theme.space[3]};
   font-size: ${props => props.theme.fontSizes.md};
   color: ${props => props.theme.colors.text};
   line-height: ${props => props.theme.lineHeights.relaxed};
@@ -89,10 +89,10 @@ const Activity = styled.div`
 const PrivacyInfo = styled.div`
   display: flex;
   align-items: center;
-  gap: ${props => props.theme.spacing[1]};
+  gap: ${props => props.theme.space[1]};
   font-size: ${props => props.theme.fontSizes.xs};
   color: ${props => props.theme.colors.textLight};
-  margin-bottom: ${props => props.theme.spacing[3]};
+  margin-bottom: ${props => props.theme.space[3]};
 `;
 
 const PrivacyIcon = styled(FaUserFriends)`
@@ -103,8 +103,8 @@ const JoinButton = styled.button`
   background-color: ${props => props.theme.colors.primary};
   color: white;
   border: none;
-  border-radius: ${props => props.theme.borderRadius.md};
-  padding: ${props => props.theme.spacing[2]} ${props => props.theme.spacing[4]};
+  border-radius: ${props => props.theme.radii.md};
+  padding: ${props => props.theme.space[2]} ${props => props.theme.space[4]};
   font-size: ${props => props.theme.fontSizes.sm};
   font-weight: ${props => props.theme.fontWeights.medium};
   cursor: pointer;
@@ -112,7 +112,7 @@ const JoinButton = styled.button`
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: ${props => props.theme.spacing[2]};
+  gap: ${props => props.theme.space[2]};
   
   &:hover {
     background-color: ${props => props.theme.colors.primaryDark};
@@ -128,9 +128,9 @@ const SelfTag = styled.span`
   background-color: ${props => props.theme.colors.primary};
   color: white;
   font-size: ${props => props.theme.fontSizes.xs};
-  padding: ${props => props.theme.spacing[1]} ${props => props.theme.spacing[2]};
-  border-radius: ${props => props.theme.borderRadius.full};
-  margin-left: ${props => props.theme.spacing[2]};
+  padding: ${props => props.theme.space[1]} ${props => props.theme.space[2]};
+  border-radius: ${props => props.theme.radii.full};
+  margin-left: ${props => props.theme.space[2]};
 `;
 
 interface StatusCardProps {
