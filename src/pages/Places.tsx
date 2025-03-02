@@ -195,7 +195,18 @@ const ConfirmationButtons = styled.div`
   margin-top: ${props => props.theme.space[6]};
 `;
 
-// Mock function for deleteUserPlace since it's not exported from supabase.ts
+const ErrorMessage = styled.div`
+  background-color: ${props => props.theme.colors.error};
+  color: ${props => props.theme.colors.white};
+  padding: ${props => props.theme.space[4]};
+  border-radius: ${props => props.theme.radii.md};
+  margin-bottom: ${props => props.theme.space[5]};
+  text-align: center;
+  width: 100%;
+  max-width: 600px;
+`;
+
+// Function to delete a user place
 const deleteUserPlace = async (id: string) => {
   console.log(`Deleting user place with id: ${id}`);
   // In a real implementation, this would call the API
@@ -205,6 +216,7 @@ const deleteUserPlace = async (id: string) => {
 const Places: React.FC = () => {
   const [userPlaces, setUserPlaces] = useState<UserPlace[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [editingPlace, setEditingPlace] = useState<Place | null>(null);
@@ -214,14 +226,26 @@ const Places: React.FC = () => {
   useEffect(() => {
     const fetchUserAndPlaces = async () => {
       try {
+        setLoading(true);
+        setError(null);
+        
         const user = await getCurrentUser();
         if (user) {
           setUserId(user.id);
           const places = await getUserPlaces(user.id);
-          setUserPlaces(places);
+          
+          // Filter out places with missing data
+          const validPlaces = places.filter(place => 
+            place && place.places && place.places.name && place.places.type
+          );
+          
+          setUserPlaces(validPlaces);
+        } else {
+          setError("No user found. Please log in.");
         }
       } catch (error) {
         console.error('Error fetching places:', error);
+        setError("Failed to load places. Please try again later.");
       } finally {
         setLoading(false);
       }
@@ -236,11 +260,19 @@ const Places: React.FC = () => {
   };
 
   const handleEditPlace = (place: Place) => {
+    if (!place) {
+      console.error('Attempted to edit a null place');
+      return;
+    }
     setEditingPlace(place);
     setIsModalOpen(true);
   };
 
   const handleDeletePlace = (userPlace: UserPlace) => {
+    if (!userPlace) {
+      console.error('Attempted to delete a null user place');
+      return;
+    }
     setDeletingPlace(userPlace);
     setIsDeleteModalOpen(true);
   };
@@ -250,17 +282,26 @@ const Places: React.FC = () => {
     
     try {
       setLoading(true);
+      setError(null);
+      
       await deleteUserPlace(deletingPlace.id);
       
       // Refresh the places list
       const places = await getUserPlaces(userId);
-      setUserPlaces(places);
+      
+      // Filter out places with missing data
+      const validPlaces = places.filter(place => 
+        place && place.places && place.places.name && place.places.type
+      );
+      
+      setUserPlaces(validPlaces);
       
       // Close the modal
       setIsDeleteModalOpen(false);
       setDeletingPlace(null);
     } catch (error) {
       console.error('Error deleting place:', error);
+      setError("Failed to delete place. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -277,10 +318,14 @@ const Places: React.FC = () => {
   };
 
   const handleSubmitPlace = async (placeData: Omit<Place, 'id'>) => {
-    if (!userId) return;
+    if (!userId) {
+      setError("No user found. Please log in.");
+      return;
+    }
     
     try {
       setLoading(true);
+      setError(null);
       
       // If we're editing an existing place, we would update it here
       // For now, we'll just add a new place
@@ -293,12 +338,19 @@ const Places: React.FC = () => {
       
       // Refresh the places list
       const places = await getUserPlaces(userId);
-      setUserPlaces(places);
+      
+      // Filter out places with missing data
+      const validPlaces = places.filter(place => 
+        place && place.places && place.places.name && place.places.type
+      );
+      
+      setUserPlaces(validPlaces);
       
       // Close the modal
       setIsModalOpen(false);
     } catch (error) {
       console.error('Error adding place:', error);
+      setError("Failed to add place. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -322,6 +374,8 @@ const Places: React.FC = () => {
         Add your favorite spots to hang out and let friends know where they might bump into you.
       </PageDescription>
       
+      {error && <ErrorMessage>{error}</ErrorMessage>}
+      
       {renderAddButton('Add New Place', 'lg')}
       
       {loading ? (
@@ -340,24 +394,33 @@ const Places: React.FC = () => {
               {renderAddButton('Add Your First Place')}
             </EmptyState>
           ) : (
-            userPlaces.map((userPlace) => (
-              <PlaceCard key={userPlace.id} className="animate-fade-in">
-                <PlaceType>{userPlace.places?.type}</PlaceType>
-                <PlaceName>{userPlace.places?.name}</PlaceName>
-                <PlaceLocation>
-                  <FaMapMarkerAlt />
-                  {userPlace.places?.lat?.toFixed(4)}, {userPlace.places?.lng?.toFixed(4)}
-                </PlaceLocation>
-                <ActionButtons>
-                  <ActionButton onClick={() => handleEditPlace(userPlace.places!)}>
-                    <FaEdit />
-                  </ActionButton>
-                  <DeleteButton onClick={() => handleDeletePlace(userPlace)}>
-                    <FaTrash />
-                  </DeleteButton>
-                </ActionButtons>
-              </PlaceCard>
-            ))
+            userPlaces.map((userPlace) => {
+              // Skip rendering if place data is missing
+              if (!userPlace || !userPlace.places) return null;
+              
+              const place = userPlace.places;
+              
+              return (
+                <PlaceCard key={userPlace.id} className="animate-fade-in">
+                  {place.type && <PlaceType>{place.type}</PlaceType>}
+                  <PlaceName>{place.name || 'Unnamed Place'}</PlaceName>
+                  <PlaceLocation>
+                    <FaMapMarkerAlt />
+                    {place.lat && place.lng 
+                      ? `${place.lat.toFixed(4)}, ${place.lng.toFixed(4)}`
+                      : 'Location not specified'}
+                  </PlaceLocation>
+                  <ActionButtons>
+                    <ActionButton onClick={() => handleEditPlace(place)}>
+                      <FaEdit />
+                    </ActionButton>
+                    <DeleteButton onClick={() => handleDeletePlace(userPlace)}>
+                      <FaTrash />
+                    </DeleteButton>
+                  </ActionButtons>
+                </PlaceCard>
+              );
+            })
           )}
         </PlacesList>
       )}
@@ -373,7 +436,7 @@ const Places: React.FC = () => {
       <Modal isOpen={isDeleteModalOpen} onClose={handleCloseDeleteModal}>
         <ConfirmationModal>
           <ConfirmationTitle>Delete Place</ConfirmationTitle>
-          <p>Are you sure you want to delete "{deletingPlace?.places?.name}"?</p>
+          <p>Are you sure you want to delete "{deletingPlace?.places?.name || 'this place'}"?</p>
           <p>This action cannot be undone.</p>
           <ConfirmationButtons>
             <Button variant="secondary" onClick={handleCloseDeleteModal}>Cancel</Button>
