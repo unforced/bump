@@ -22,7 +22,7 @@ Tool: Cursor (React/Vite)
 Authors: You (visionary), Grok 3 (xAI assistant)
 1. Overview
 Purpose
-“Bump” is an app crafted to enhance spontaneous in-person connections by helping users bump into friends at their favorite gathering spots. Drawing from Boulder’s vibrant social fabric, it enables sharing of hangout locations, real-time status updates, and logging of serendipitous meetups, blending chance with subtle intent.
+"Bump" is an app crafted to enhance spontaneous in-person connections by helping users bump into friends at their favorite gathering spots. Drawing from Boulder's vibrant social fabric, it enables sharing of hangout locations, real-time status updates, and logging of serendipitous meetups, blending chance with subtle intent.
 Goals
 Core: Allow users to list gathering places, share real-time statuses, and track spontaneous meetups.
 
@@ -35,49 +35,49 @@ Individuals in community-oriented places (e.g., Boulder) who cherish spontaneous
 2. Features
 Core Features (MVP)
 Gathering Places  
-Users list favorite spots (e.g., “MycoCafe,” “North Boulder Park”) tied to Google Maps.
+Users list favorite spots (e.g., "MycoCafe," "North Boulder Park") tied to Google Maps.
 
-Shared place database (one “MycoCafe” across users).
+Shared place database (one "MycoCafe" across users).
 
 Visibility defaults to friends-only.
 
 Real-Time Status  
-Check in with an activity (e.g., “reading at MycoCafe”).
+Check in with an activity (e.g., "reading at MycoCafe").
 
 Per-check-in privacy: Share with all friends, intended-bump friends, or specific friends.
 
-“Join” button to mirror a friend’s status (e.g., “playing spikeball” → you join).
+"Join" button to mirror a friend's status (e.g., "playing spikeball" → you join).
 
 Statuses marked active/inactive (manual checkout or 2-hour timeout).
 
 Friends & Intend to Bump  
-Add friends with “Intend to Bump” settings (off/private/shared).
+Add friends with "Intend to Bump" settings (off/private/shared).
 
-Private: You’re notified of their check-ins (if available).
+Private: You're notified of their check-ins (if available).
 
 Shared: Mutual intent and check-in notifications.
 
 Meetups  
-Log Encounters (e.g., “Met Alex at Tonic”).
+Log Encounters (e.g., "Met Alex at Tonic").
 
 Indicate if intentional (planned) or spontaneous.
 
-View history and stats (e.g., “3 meetups this month”).
+View history and stats (e.g., "3 meetups this month").
 
 Notifications & Settings  
-Custom notifications for check-ins (e.g., “9 AM-5 PM,” “intended friends only”).
+Custom notifications for check-ins (e.g., "9 AM-5 PM," "intended friends only").
 
-“Do Not Disturb” toggle.
+"Do Not Disturb" toggle.
 
 Future Features
-AI pattern recognition (e.g., “Likely bump at Tonic, 2-4 PM”).
+AI pattern recognition (e.g., "Likely bump at Tonic, 2-4 PM").
 
-Impromptu events (e.g., “Frisbee at the park” for friends or strangers).
+Impromptu events (e.g., "Frisbee at the park" for friends or strangers).
 
 3. User Experience (Design Specification)
 Screens
 Home  
-Content: Friends’ active statuses (e.g., “Sarah: MycoCafe, reading”), grouped by place (e.g., “4 at North Boulder Park”). Your status + “Check In” button.  
+Content: Friends' active statuses (e.g., "Sarah: MycoCafe, reading"), grouped by place (e.g., "4 at North Boulder Park"). Your status + "Check In" button.  
 
 Actions: Join a status, check in.
 
@@ -87,7 +87,7 @@ Content: Card list of your spots, add/edit options.
 Actions: Link to Google Maps, set visibility.
 
 Friends  
-Content: Friend list with “Intend to Bump” toggles (off/private/shared).  
+Content: Friend list with "Intend to Bump" toggles (off/private/shared).  
 
 Actions: Add friend, adjust intent.
 
@@ -97,18 +97,18 @@ Content: Log form (friend name, place, intentional?), history list.
 Actions: Add meetup, filter history.
 
 Settings  
-Content: Availability times, notification prefs, “Do Not Disturb.”  
+Content: Availability times, notification prefs, "Do Not Disturb."  
 
 Actions: Update settings.
 
 Flows
 Onboarding: Sign up → Add 1-3 places → Add friends → Home.
 
-Check-In: Home → “Check In” → Pick place → Add activity → Set privacy → Submit.
+Check-In: Home → "Check In" → Pick place → Add activity → Set privacy → Submit.
 
-Join Friend: Home → Friend’s status → “Join” → Your status updates.
+Join Friend: Home → Friend's status → "Join" → Your status updates.
 
-Bump Intent: Friends → Toggle “Intend to Bump” → Notifications trigger.
+Bump Intent: Friends → Toggle "Intend to Bump" → Notifications trigger.
 
 Design Aesthetic
 Vibe: Playful and earthy—warm tones (forest green, sandstone beige), hand-drawn icons (coffee cup, park bench), bouncy animations (e.g., pulsing check-in button).
@@ -186,49 +186,48 @@ Quantitative: 10 daily check-ins, 5 weekly meetups logged.
 Qualitative: Users report easier spontaneous meetups.
 
 Cursor Action Plan
-Here’s how we’ll build “Bump” with Cursor in a local React/Vite environment, step by step. Since Cursor is an AI assistant within your IDE (e.g., VS Code), these steps involve prompting Cursor to generate code, which you’ll integrate manually.
+Here's how we'll build "Bump" with Cursor in a local React/Vite environment, step by step. Since Cursor is an AI assistant within your IDE (e.g., VS Code), these steps involve prompting Cursor to generate code, which you'll integrate manually.
 Initialize Project  
 Setup: Run npm create vite@latest bump --template react-ts in terminal, install dependencies (react-router-dom, styled-components, @react-google-maps/api, @supabase/supabase-js, workbox-window).
 
-Prompt: “Generate a React/Vite PWA setup for ‘Bump’ with TypeScript. Add react-router-dom for navigation, styled-components for styling, and a basic PWA manifest with workbox. Create routes for Home, Gathering Places, Friends, Meetups, and Settings.”
+Prompt: "Generate a React/Vite PWA setup for 'Bump' with TypeScript. Add react-router-dom for navigation, styled-components for styling, and a basic PWA manifest with workbox. Create routes for Home, Gathering Places, Friends, Meetups, and Settings."
 
 Goal: App shell with routing and PWA config.
 
 Supabase Integration  
 Setup: Create a Supabase project, get API keys, install @supabase/supabase-js.
 
-Prompt: “Set up Supabase for ‘Bump’ with tables: Users, Places, User_Places, Statuses, Meetups, Friends, Settings (as per schema). Generate a Supabase client in React with real-time subscriptions for Statuses.”
+Prompt: "Set up Supabase for 'Bump' with tables: Users, Places, User_Places, Statuses, Meetups, Friends, Settings (as per schema). Generate a Supabase client in React with real-time subscriptions for Statuses."
 
 Goal: Backend connection with real-time data.
 
 Home Page & Check-In  
-Prompt: “Create a Home page for ‘Bump’ with a list of friends’ active statuses (grouped by place) fetched from Supabase. Add a CheckInForm component with a privacy dropdown (all friends, intended friends, specific friends) and a ‘Join’ button to copy a status. Use styled-components for an earthy vibe (greens, beiges).”
+Prompt: "Create a Home page for 'Bump' with a list of friends' active statuses (grouped by place) fetched from Supabase. Add a CheckInForm component with a privacy dropdown (all friends, intended friends, specific friends) and a 'Join' button to copy a status. Use styled-components for an earthy vibe (greens, beiges)."
 
 Goal: Core social loop.
 
 Gathering Places Page  
-Prompt: “Build a Gathering Places page for ‘Bump’ with a card list of user-favorite spots from Supabase (shared Places and User_Places tables). Add a form to link places to Google Maps via @react
--google-maps/api. Style with playful animations.”
+Prompt: "Build a Gathering Places page for 'Bump' with a card list of user-favorite spots from Supabase (shared Places and User_Places tables). Add a form to link places to Google Maps via @react-google-maps/api. Style with playful animations."
 
 Goal: Place management.
 
 Friends Page & Intent  
-Prompt: “Generate a Friends page for ‘Bump’ with a list of friends from Supabase, including ‘Intend to Bump’ toggles (off/private/shared). Connect to the Friends table and set up notification logic tied to Settings.”
+Prompt: "Generate a Friends page for 'Bump' with a list of friends from Supabase, including 'Intend to Bump' toggles (off/private/shared). Connect to the Friends table and set up notification logic tied to Settings."
 
 Goal: Social connections.
 
 Meetups Page  
-Prompt: “Create a Meetups page for ‘Bump’ with a form to log meetups (friend name, place, intentional checkbox) and a history list, synced with Supabase’s Meetups table. Style it earthy and clean.”
+Prompt: "Create a Meetups page for 'Bump' with a form to log meetups (friend name, place, intentional checkbox) and a history list, synced with Supabase's Meetups table. Style it earthy and clean."
 
 Goal: Encounter tracking.
 
 Settings Page  
-Prompt: “Build a Settings page for ‘Bump’ with availability times, notification preferences, and a ‘Do Not Disturb’ toggle, linked to Supabase’s Settings table. Add bouncy animations to buttons.”
+Prompt: "Build a Settings page for 'Bump' with availability times, notification preferences, and a 'Do Not Disturb' toggle, linked to Supabase's Settings table. Add bouncy animations to buttons."
 
 Goal: User customization.
 
 Polish & Deploy  
-Prompt: “Add playful animations (e.g., pulsing check-in button) and earthy colors to ‘Bump.’ Finalize PWA service worker with workbox. Provide instructions to push to GitHub and deploy to Vercel with Supabase connected.”
+Prompt: "Add playful animations (e.g., pulsing check-in button) and earthy colors to 'Bump.' Finalize PWA service worker with workbox. Provide instructions to push to GitHub and deploy to Vercel with Supabase connected."
 
 Goal: Launch-ready web MVP.
 

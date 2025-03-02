@@ -1,9 +1,215 @@
 // Theme configuration for the Bump app
 
-export const theme = {
+// Define theme interfaces for type safety
+export interface ThemeColors {
+  primary: string;
+  secondary: string;
+  background: string;
+  backgroundAlt: string;
+  text: string;
+  textLight: string;
+  accent: string;
+  error: string;
+  success: string;
+  lightGray: string;
+  mediumGray: string;
+  darkGray: string;
+  white: string;
+  black: string;
+  overlay: string;
+  shadow: string;
+  // Add derived colors that might be used in components
+  primaryDark?: string;
+  primaryDarker?: string;
+  secondaryDark?: string;
+  secondaryDarker?: string;
+}
+
+export interface ThemeFonts {
+  body: string;
+  heading: string;
+  monospace: string;
+}
+
+export interface ThemeFontSizes {
+  xs: string;
+  sm: string;
+  md: string;
+  lg: string;
+  xl: string;
+  '2xl': string;
+  '3xl': string;
+  '4xl': string;
+  '5xl': string;
+}
+
+export interface ThemeFontWeights {
+  normal: number;
+  medium: number;
+  semibold: number;
+  bold: number;
+}
+
+export interface ThemeLineHeights {
+  normal: string | number;
+  none: number;
+  shorter: number;
+  short: number;
+  base: number;
+  tall: number;
+  taller: number;
+}
+
+export interface ThemeSpace {
+  px: string;
+  0.5: string;
+  1: string;
+  1.5: string;
+  2: string;
+  2.5: string;
+  3: string;
+  3.5: string;
+  4: string;
+  5: string;
+  6: string;
+  7: string;
+  8: string;
+  9: string;
+  10: string;
+  12: string;
+  14: string;
+  16: string;
+  20: string;
+  24: string;
+  28: string;
+  32: string;
+  36: string;
+  40: string;
+  44: string;
+  48: string;
+  52: string;
+  56: string;
+  60: string;
+  64: string;
+  72: string;
+  80: string;
+  96: string;
+  [key: string]: string;
+  [key: number]: string;
+}
+
+export interface ThemeSizes {
+  full: string;
+  '3xs': string;
+  '2xs': string;
+  xs: string;
+  sm: string;
+  md: string;
+  lg: string;
+  xl: string;
+  '2xl': string;
+  '3xl': string;
+  '4xl': string;
+  '5xl': string;
+  '6xl': string;
+  '7xl': string;
+  '8xl': string;
+}
+
+export interface ThemeRadii {
+  none: string;
+  sm: string;
+  base: string;
+  md: string;
+  lg: string;
+  xl: string;
+  '2xl': string;
+  '3xl': string;
+  full: string;
+}
+
+export interface ThemeShadows {
+  sm: string;
+  base: string;
+  md: string;
+  lg: string;
+  xl: string;
+  '2xl': string;
+  inner: string;
+  outline: string;
+  none: string;
+}
+
+export interface ThemeBreakpoints {
+  xs: string;
+  sm: string;
+  md: string;
+  lg: string;
+  xl: string;
+  '2xl': string;
+}
+
+export interface ThemeZIndices {
+  hide: number;
+  auto: string;
+  base: number;
+  docked: number;
+  dropdown: number;
+  sticky: number;
+  banner: number;
+  overlay: number;
+  modal: number;
+  popover: number;
+  skipLink: number;
+  toast: number;
+  tooltip: number;
+}
+
+export interface ThemeTransitions {
+  easing: {
+    easeInOut: string;
+    easeOut: string;
+    easeIn: string;
+    sharp: string;
+  };
+  duration: {
+    fastest: string;
+    faster: string;
+    fast: string;
+    normal: string;
+    slow: string;
+    slower: string;
+    slowest: string;
+  };
+}
+
+export interface Theme {
+  colors: ThemeColors;
+  fonts: ThemeFonts;
+  fontSizes: ThemeFontSizes;
+  fontWeights: ThemeFontWeights;
+  lineHeights: ThemeLineHeights;
+  space: ThemeSpace;
+  sizes: ThemeSizes;
+  radii: ThemeRadii;
+  shadows: ThemeShadows;
+  breakpoints: ThemeBreakpoints;
+  zIndices: ThemeZIndices;
+  transitions: ThemeTransitions;
+}
+
+// Add derived colors
+const primaryColor = '#4a7c59'; // Forest green
+const secondaryColor = '#f5f1e3'; // Sandstone beige
+
+export const theme: Theme = {
   colors: {
-    primary: '#4a7c59', // Forest green
-    secondary: '#f5f1e3', // Sandstone beige
+    primary: primaryColor,
+    primaryDark: '#3a6a49', // Darker shade for hover states
+    primaryDarker: '#2a5a39', // Even darker for active states
+    secondary: secondaryColor,
+    secondaryDark: '#e5e1d3', // Darker shade for hover states
+    secondaryDarker: '#d5d1c3', // Even darker for active states
     background: '#f9f7f2',
     backgroundAlt: '#f0ece0', // Lighter sandstone for alternate backgrounds
     text: '#333333',
