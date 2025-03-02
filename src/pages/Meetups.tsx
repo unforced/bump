@@ -114,16 +114,16 @@ const MeetupLocation = styled.div`
   }
 `;
 
-const MeetupType = styled.div<{ isIntentional: boolean }>`
+const MeetupType = styled.div<{ $isIntentional: boolean }>`
   display: inline-block;
   padding: ${({ theme }) => theme.space[1]} ${({ theme }) => theme.space[3]};
   border-radius: ${({ theme }) => theme.radii.full};
   font-size: ${({ theme }) => theme.fontSizes.sm};
   font-weight: ${({ theme }) => theme.fontWeights.medium};
-  background-color: ${({ theme, isIntentional }) => 
-    isIntentional ? theme.colors.secondary + '20' : theme.colors.primary + '20'};
-  color: ${({ theme, isIntentional }) => 
-    isIntentional ? theme.colors.secondary : theme.colors.primary};
+  background-color: ${({ theme, $isIntentional }) => 
+    $isIntentional ? theme.colors.secondary + '20' : theme.colors.primary + '20'};
+  color: ${({ theme, $isIntentional }) => 
+    $isIntentional ? theme.colors.secondary : theme.colors.primary};
 `;
 
 const EmptyState = styled.div`
@@ -688,7 +688,7 @@ const Meetups: React.FC = () => {
                     </svg>
                     {meetup.places?.name || 'Unknown location'}
                   </MeetupLocation>
-                  <MeetupType isIntentional={meetup.was_intentional}>
+                  <MeetupType $isIntentional={meetup.was_intentional}>
                     {meetup.was_intentional ? 'Planned' : 'Spontaneous'}
                   </MeetupType>
                 </MeetupCard>
