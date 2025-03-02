@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { Friend } from '../types';
 import { updateIntendToBump } from '../services/supabase';
 import { useTheme } from '../contexts/ThemeContext';
+import { useNavigate } from 'react-router-dom';
 
 const Card = styled.div`
   background-color: ${({ theme }) => theme.colors.secondary};
@@ -28,6 +29,27 @@ const FriendInfoRow = styled.div`
 `;
 
 const FriendInfo = styled.div`
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+`;
+
+const Avatar = styled.div`
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-color: ${({ theme }) => theme.colors.primary};
+  color: ${({ theme }) => theme.colors.white};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: ${({ theme }) => theme.fontSizes.xl};
+  font-weight: ${({ theme }) => theme.fontWeights.bold};
+  margin-right: ${({ theme }) => theme.space[3]};
+  box-shadow: ${({ theme }) => theme.shadows.sm};
+`;
+
+const NameContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -56,7 +78,7 @@ const IntendHeader = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: ${({ theme }) => theme.space[2]};
+  margin-bottom: ${({ theme }) => theme.space[3]};
 `;
 
 const IntendLabel = styled.span`
@@ -65,52 +87,112 @@ const IntendLabel = styled.span`
   color: ${({ theme }) => theme.colors.text};
 `;
 
-const ToggleSelect = styled.select`
-  padding: ${({ theme }) => theme.space[2]};
+const ToggleContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: ${({ theme }) => theme.space[2]};
+`;
+
+const ToggleOption = styled.button<{ $isActive: boolean; $optionType: 'off' | 'private' | 'shared' }>`
+  padding: ${({ theme }) => `${theme.space[1.5]} ${theme.space[3]}`};
   border-radius: ${({ theme }) => theme.radii.md};
-  border: 1px solid ${({ theme }) => theme.colors.lightGray};
-  background-color: ${({ theme }) => theme.colors.white};
   font-size: ${({ theme }) => theme.fontSizes.sm};
+  font-weight: ${({ theme }) => theme.fontWeights.medium};
   cursor: pointer;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition: all 0.2s ease;
+  border: none;
   
-  &:focus {
-    outline: none;
-    border-color: ${({ theme }) => theme.colors.primary};
-    box-shadow: 0 0 0 2px ${({ theme }) => `${theme.colors.primary}30`};
+  background-color: ${({ theme, $isActive, $optionType }) => 
+    $isActive 
+      ? $optionType === 'off' 
+        ? theme.colors.mediumGray
+        : $optionType === 'private'
+          ? theme.colors.accent
+          : theme.colors.success
+      : theme.colors.white
+  };
+  
+  color: ${({ theme, $isActive }) => 
+    $isActive ? theme.colors.white : theme.colors.text
+  };
+  
+  border: 1px solid ${({ theme, $isActive, $optionType }) => 
+    $isActive 
+      ? 'transparent'
+      : $optionType === 'off'
+        ? theme.colors.mediumGray
+        : $optionType === 'private'
+          ? theme.colors.accent
+          : theme.colors.success
+  };
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: ${({ theme }) => theme.shadows.sm};
   }
   
   &:disabled {
     opacity: 0.7;
     cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
   }
 `;
 
-const StatusIndicator = styled.div<{ status: 'off' | 'private' | 'shared' }>`
+const StatusWrapper = styled.div<{ $status: 'off' | 'private' | 'shared' }>`
+  display: flex;
+  align-items: center;
+  margin-top: ${({ theme }) => theme.space[2]};
+  padding: ${({ theme }) => theme.space[3]};
+  background-color: ${({ theme, $status }) => 
+    $status === 'off' 
+      ? `${theme.colors.mediumGray}20` 
+      : $status === 'private' 
+        ? `${theme.colors.accent}20` 
+        : `${theme.colors.success}20`
+  };
+  border-radius: ${({ theme }) => theme.radii.md};
+  border-left: 4px solid ${({ theme, $status }) => 
+    $status === 'off' 
+      ? theme.colors.mediumGray 
+      : $status === 'private' 
+        ? theme.colors.accent 
+        : theme.colors.success
+  };
+  transition: all 0.3s ease;
+`;
+
+const StatusIndicator = styled.div<{ $status: 'off' | 'private' | 'shared' }>`
   width: 10px;
   height: 10px;
   border-radius: 50%;
   margin-right: ${({ theme }) => theme.space[2]};
-  background-color: ${props => 
-    props.status === 'off' ? props.theme.colors.mediumGray : 
-    props.status === 'private' ? props.theme.colors.accent : 
-    props.theme.colors.success
+  background-color: ${({ theme, $status }) => 
+    $status === 'off' ? theme.colors.mediumGray : 
+    $status === 'private' ? theme.colors.accent : 
+    theme.colors.success
   };
   transition: background-color 0.3s ease;
-`;
-
-const StatusWrapper = styled.div`
-  display: flex;
-  align-items: center;
-  margin-top: ${({ theme }) => theme.space[2]};
-  padding: ${({ theme }) => theme.space[2]};
-  background-color: ${({ theme }) => theme.colors.backgroundAlt};
-  border-radius: ${({ theme }) => theme.radii.md};
 `;
 
 const StatusText = styled.span`
   font-size: ${({ theme }) => theme.fontSizes.sm};
   color: ${({ theme }) => theme.colors.text};
+  flex: 1;
+`;
+
+const MutualIndicator = styled.span`
+  font-size: ${({ theme }) => theme.fontSizes.sm};
+  color: ${({ theme }) => theme.colors.success};
+  font-weight: ${({ theme }) => theme.fontWeights.semibold};
+  display: flex;
+  align-items: center;
+  gap: ${({ theme }) => theme.space[1]};
+  
+  &::before {
+    content: '•';
+    font-size: ${({ theme }) => theme.fontSizes.xl};
+  }
 `;
 
 const LoadingSpinner = styled.div`
@@ -128,18 +210,39 @@ const LoadingSpinner = styled.div`
   }
 `;
 
+const ViewProfileButton = styled.button`
+  background-color: transparent;
+  color: ${({ theme }) => theme.colors.primary};
+  border: 1px solid ${({ theme }) => theme.colors.primary};
+  border-radius: ${({ theme }) => theme.radii.md};
+  padding: ${({ theme }) => `${theme.space[1]} ${theme.space[3]}`};
+  font-size: ${({ theme }) => theme.fontSizes.sm};
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: ${({ theme }) => theme.space[3]};
+  align-self: flex-end;
+  
+  &:hover {
+    background-color: ${({ theme }) => `${theme.colors.primary}10`};
+    transform: translateY(-2px);
+  }
+`;
+
 interface FriendCardProps {
   friend: Friend;
   onUpdate: () => void;
+  hasMutualIntent?: boolean;
 }
 
-const FriendCard: React.FC<FriendCardProps> = ({ friend, onUpdate }) => {
+const FriendCard: React.FC<FriendCardProps> = ({ friend, onUpdate, hasMutualIntent = false }) => {
   const theme = useTheme();
+  const navigate = useNavigate();
   const [intendToBump, setIntendToBump] = useState(friend.intend_to_bump);
   const [isUpdating, setIsUpdating] = useState(false);
   
-  const handleIntendChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const newValue = e.target.value as 'off' | 'private' | 'shared';
+  const handleIntendChange = async (newValue: 'off' | 'private' | 'shared') => {
+    if (newValue === intendToBump) return;
+    
     setIntendToBump(newValue);
     setIsUpdating(true);
     
@@ -162,7 +265,7 @@ const FriendCard: React.FC<FriendCardProps> = ({ friend, onUpdate }) => {
       case 'private':
         return 'Privately intending to bump';
       case 'shared':
-        return 'Mutually intending to bump';
+        return 'Intending to bump';
       default:
         return '';
     }
@@ -184,36 +287,73 @@ const FriendCard: React.FC<FriendCardProps> = ({ friend, onUpdate }) => {
     return friend.users_view?.email?.split('@')[0] || 'Anonymous';
   };
   
+  const getInitials = (name: string) => {
+    return name.substring(0, 2).toUpperCase();
+  };
+  
+  const handleViewProfile = () => {
+    navigate(`/friends/${friend.friend_id}`);
+  };
+  
   return (
     <Card theme={theme}>
       <FriendInfoRow theme={theme}>
-        <FriendInfo>
-          <FriendName theme={theme}>{getFriendName()}</FriendName>
-          <FriendEmail theme={theme}>{friend.users_view?.email}</FriendEmail>
+        <FriendInfo onClick={handleViewProfile}>
+          <Avatar theme={theme}>{getInitials(getFriendName())}</Avatar>
+          <NameContainer>
+            <FriendName theme={theme}>{getFriendName()}</FriendName>
+            <FriendEmail theme={theme}>{friend.users_view?.email}</FriendEmail>
+          </NameContainer>
         </FriendInfo>
       </FriendInfoRow>
       
       <IntendSection theme={theme}>
         <IntendHeader theme={theme}>
           <IntendLabel theme={theme}>Intend to Bump</IntendLabel>
-          <ToggleSelect 
-            theme={theme}
-            value={intendToBump} 
-            onChange={handleIntendChange}
-            disabled={isUpdating}
-          >
-            <option value="off">Off</option>
-            <option value="private">Private</option>
-            <option value="shared">Shared</option>
-          </ToggleSelect>
+          <ToggleContainer theme={theme}>
+            <ToggleOption 
+              theme={theme}
+              $isActive={intendToBump === 'off'}
+              $optionType="off"
+              onClick={() => handleIntendChange('off')}
+              disabled={isUpdating}
+            >
+              Off
+            </ToggleOption>
+            <ToggleOption 
+              theme={theme}
+              $isActive={intendToBump === 'private'}
+              $optionType="private"
+              onClick={() => handleIntendChange('private')}
+              disabled={isUpdating}
+            >
+              Private
+            </ToggleOption>
+            <ToggleOption 
+              theme={theme}
+              $isActive={intendToBump === 'shared'}
+              $optionType="shared"
+              onClick={() => handleIntendChange('shared')}
+              disabled={isUpdating}
+            >
+              Shared
+            </ToggleOption>
+          </ToggleContainer>
         </IntendHeader>
         
-        <StatusWrapper theme={theme}>
-          <StatusIndicator theme={theme} status={intendToBump} />
+        <StatusWrapper theme={theme} $status={intendToBump}>
+          <StatusIndicator theme={theme} $status={intendToBump} />
           <StatusText theme={theme}>{getStatusText(intendToBump)}</StatusText>
+          {hasMutualIntent && intendToBump === 'shared' && (
+            <MutualIndicator theme={theme}>Mutual</MutualIndicator>
+          )}
           {isUpdating && <LoadingSpinner theme={theme} />}
         </StatusWrapper>
       </IntendSection>
+      
+      <ViewProfileButton theme={theme} onClick={handleViewProfile}>
+        View Profile
+      </ViewProfileButton>
     </Card>
   );
 };

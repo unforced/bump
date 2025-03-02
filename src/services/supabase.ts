@@ -236,6 +236,21 @@ export const getActiveStatuses = async () => {
   return data;
 };
 
+export const getActiveStatusesByUserId = async (userId: string) => {
+  const { data, error } = await supabase
+    .from('statuses')
+    .select(`
+      *,
+      places:place_id(*)
+    `)
+    .eq('user_id', userId)
+    .eq('is_active', true);
+  
+  if (error) throw error;
+  
+  return data;
+};
+
 export const checkIn = async (userId: string, placeId: string, activity: string, privacy: string) => {
   // First, deactivate any existing active statuses for this user
   await supabase
@@ -298,6 +313,38 @@ export const getFriends = async (userId: string) => {
   }
   
   return data;
+};
+
+export const getFriendById = async (userId: string, friendId: string) => {
+  const { data, error } = await supabase
+    .from('friends')
+    .select('*')
+    .eq('user_id', userId)
+    .eq('friend_id', friendId)
+    .single();
+  
+  if (error) {
+    if (error.code === 'PGRST116') {
+      // No rows returned, friend relationship doesn't exist
+      return null;
+    }
+    throw error;
+  }
+  
+  // Fetch user data for the friend
+  const { data: userData, error: userError } = await supabase
+    .from('users_view')
+    .select('*')
+    .eq('id', friendId)
+    .single();
+  
+  if (userError) throw userError;
+  
+  // Attach user data to the friend
+  return {
+    ...data,
+    users_view: userData
+  };
 };
 
 export const addFriend = async (userId: string, friendId: string, intendToBump: string = 'off') => {
@@ -405,6 +452,19 @@ export const updateSettings = async (userId: string, settings: any) => {
   const { data, error } = await supabase
     .from('settings')
     .update(settings)
+    .eq('user_id', userId);
+  
+  if (error) throw error;
+  return data;
+};
+
+export const getUserPlacesByUserId = async (userId: string) => {
+  const { data, error } = await supabase
+    .from('user_places')
+    .select(`
+      *,
+      places:place_id(*)
+    `)
     .eq('user_id', userId);
   
   if (error) throw error;

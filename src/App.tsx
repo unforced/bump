@@ -6,6 +6,7 @@ import Friends from './pages/Friends';
 import Meetups from './pages/Meetups';
 import Settings from './pages/Settings';
 import Login from './pages/Login';
+import FriendProfile from './pages/FriendProfile';
 import Navigation from './components/Navigation';
 import NotificationBell from './components/NotificationBell';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -73,6 +74,11 @@ function App() {
                 <Route path="/friends" element={
                   <MainLayout>
                     <Friends />
+                  </MainLayout>
+                } />
+                <Route path="/friends/:friendId" element={
+                  <MainLayout>
+                    <FriendProfile />
                   </MainLayout>
                 } />
                 <Route path="/meetups" element={
