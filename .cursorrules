@@ -1,5 +1,9 @@
 We are building an app according to the following PRD. Create a file called .tracking.md which keeps track of the changes we are making in accord with this PRD and action steps. At each step you should describe what has been done and the approximate state of the project at this stage. If this file doesn't exist, you should create it. And before any major change or in any new chat context window, you should check this first. And after a significant series of major updates, when it seems it is complete, you should update this. After you make changes, you should be checking with me to ensure it works well. Assuming a major change is complete and works well, and I'm not instantly following up with more things to do, then you should update tracking.md to highlight what was done and the curent state of the app, and then you should also make a git commit with the same information.
 
+Don't commit and update unless it's clear we're complete with this step; especially if we're fixing a bug. Make sure the bug is fixed and I am satisfied before we move on.
+
+ALWAYS before committing, run `npm run build` and ensure there are no build errors.
+
 Below is the PRD. At the bottom is the action plan. You should be executing each step of the action plan, and when each step is completed it should be noted and committed. As the project evolves, other steps will come up along the way and these should also be noted, but it's important to hold the context of this action plan and to trakc it well using .trackind.md
 
 This app will be built using React/Vite. Please handle appropriate terminal commands as needed.

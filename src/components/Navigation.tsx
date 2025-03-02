@@ -1,7 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import styled from 'styled-components';
-import { useTheme } from '../contexts/ThemeContext';
 
 const NavContainer = styled.nav`
   background-color: ${props => props.theme.colors.primary};
@@ -90,8 +89,6 @@ const IconWrapper = styled.div`
 `;
 
 const Navigation: React.FC = () => {
-  const theme = useTheme();
-  
   return (
     <NavContainer className="slide-up">
       <NavList>

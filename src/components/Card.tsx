@@ -1,6 +1,5 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
-import { useTheme } from '../contexts/ThemeContext';
 
 type CardVariant = 'default' | 'outlined' | 'elevated';
 type CardPadding = 'none' | 'sm' | 'md' | 'lg';
@@ -136,8 +135,6 @@ const Card: CardComponent = ({
   animationClass,
   children,
 }) => {
-  const theme = useTheme();
-  
   return (
     <StyledCard
       variant={variant}

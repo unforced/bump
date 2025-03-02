@@ -386,7 +386,7 @@ const Home: React.FC = () => {
                 <PlaceName>{placeName}</PlaceName>
                 <PlaceCount>{placeStatuses.length}</PlaceCount>
               </PlaceHeading>
-              {placeStatuses.map((status, statusIndex) => (
+              {placeStatuses.map((status) => (
                 <StatusCard 
                   key={status.id} 
                   status={status} 

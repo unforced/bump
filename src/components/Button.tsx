@@ -1,6 +1,5 @@
 import React, { ButtonHTMLAttributes } from 'react';
 import styled, { css } from 'styled-components';
-import { useTheme } from '../contexts/ThemeContext';
 
 type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'text';
 type ButtonSize = 'sm' | 'md' | 'lg';
@@ -153,8 +152,6 @@ const Button: React.FC<ButtonProps> = ({
   className,
   ...props
 }) => {
-  const theme = useTheme();
-  
   return (
     <StyledButton
       variant={variant}

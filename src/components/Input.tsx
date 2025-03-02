@@ -1,6 +1,5 @@
-import React, { forwardRef, InputHTMLAttributes } from 'react';
+import React, { InputHTMLAttributes } from 'react';
 import styled, { css } from 'styled-components';
-import { useTheme } from '../contexts/ThemeContext';
 
 // Custom input sizes
 type InputSize = 'sm' | 'md' | 'lg';
@@ -175,7 +174,8 @@ const HelperText = styled.p<HelperTextProps>`
 `;
 
 // Component implementation
-const Input = forwardRef<HTMLInputElement, InputProps>(({
+const Input: React.FC<InputProps> = ({
+  type = 'text',
   label,
   helperText,
   error = false,
@@ -188,8 +188,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(({
   animationClass,
   className,
   ...props
-}, ref) => {
-  const theme = useTheme();
+}) => {
   const displayText = error && errorText ? errorText : helperText;
   const hasIcon = !!icon;
   
@@ -203,7 +202,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(({
           </IconWrapper>
         )}
         <StyledInput
-          ref={ref}
+          type={type}
           $size={size}
           $variant={variant}
           $error={error}
@@ -216,7 +215,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(({
       {displayText && <HelperText $error={error}>{displayText}</HelperText>}
     </InputContainer>
   );
-});
+};
 
 Input.displayName = 'Input';
 
