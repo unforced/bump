@@ -7,73 +7,163 @@ import { Status } from '../types';
 import { checkIn, getActiveStatuses, supabase } from '../services/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { useNotifications } from '../contexts/NotificationContext';
+import { FaMapMarkerAlt, FaUserFriends, FaPlus } from 'react-icons/fa';
 
 const HomeContainer = styled.div`
-  padding: 20px;
+  padding: ${props => props.theme.spacing[5]};
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
 `;
 
+const Header = styled.div`
+  margin-bottom: ${props => props.theme.spacing[6]};
+  text-align: center;
+`;
+
+const Title = styled.h1`
+  font-size: ${props => props.theme.fontSizes['3xl']};
+  color: ${props => props.theme.colors.primary};
+  margin-bottom: ${props => props.theme.spacing[2]};
+`;
+
+const Subtitle = styled.p`
+  font-size: ${props => props.theme.fontSizes.lg};
+  color: ${props => props.theme.colors.textLight};
+  max-width: 500px;
+`;
+
 const StatusList = styled.div`
-  margin-top: 20px;
+  margin-top: ${props => props.theme.spacing[5]};
   width: 100%;
   max-width: 500px;
 `;
 
 const StatusGroup = styled.div`
-  margin-bottom: 24px;
+  margin-bottom: ${props => props.theme.spacing[6]};
   text-align: left;
+  animation: fadeIn 0.5s ease-in-out;
 `;
 
-const PlaceHeading = styled.h2`
-  font-size: 1.2rem;
-  margin-bottom: 12px;
-  padding-bottom: 4px;
-  border-bottom: 1px solid #ddd;
+const PlaceHeading = styled.div`
+  display: flex;
+  align-items: center;
+  gap: ${props => props.theme.spacing[2]};
+  margin-bottom: ${props => props.theme.spacing[3]};
+  padding-bottom: ${props => props.theme.spacing[2]};
+  border-bottom: 1px solid ${props => props.theme.colors.border};
+`;
+
+const PlaceIcon = styled(FaMapMarkerAlt)`
+  color: ${props => props.theme.colors.primary};
+  font-size: ${props => props.theme.fontSizes.xl};
+`;
+
+const PlaceName = styled.h2`
+  font-size: ${props => props.theme.fontSizes.xl};
+  color: ${props => props.theme.colors.textDark};
+  margin: 0;
+`;
+
+const PlaceCount = styled.span`
+  background-color: ${props => props.theme.colors.primary};
+  color: white;
+  font-size: ${props => props.theme.fontSizes.xs};
+  font-weight: ${props => props.theme.fontWeights.bold};
+  padding: ${props => props.theme.spacing[1]} ${props => props.theme.spacing[2]};
+  border-radius: ${props => props.theme.borderRadius.full};
+  margin-left: ${props => props.theme.spacing[2]};
 `;
 
 const CheckInButton = styled.button`
-  background-color: #4a7c59; /* Forest green */
+  background-color: ${props => props.theme.colors.primary};
   color: white;
   border: none;
-  border-radius: 8px;
-  padding: 12px 24px;
-  font-size: 16px;
+  border-radius: ${props => props.theme.borderRadius.lg};
+  padding: ${props => props.theme.spacing[3]} ${props => props.theme.spacing[6]};
+  font-size: ${props => props.theme.fontSizes.lg};
+  font-weight: ${props => props.theme.fontWeights.medium};
   cursor: pointer;
-  margin-top: 20px;
+  margin-top: ${props => props.theme.spacing[5]};
   transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: ${props => props.theme.spacing[2]};
+  box-shadow: ${props => props.theme.shadows.md};
   
   &:hover {
-    background-color: #3a6a49;
-    transform: scale(1.05);
+    background-color: ${props => props.theme.colors.primaryDark};
+    transform: translateY(-2px);
+    box-shadow: ${props => props.theme.shadows.lg};
+  }
+  
+  &:active {
+    transform: translateY(0);
   }
 `;
 
+const PlusIcon = styled(FaPlus)`
+  font-size: ${props => props.theme.fontSizes.md};
+`;
+
 const EmptyState = styled.div`
-  background-color: var(--secondary-color);
-  border-radius: 12px;
-  padding: 20px;
+  background-color: ${props => props.theme.colors.backgroundAlt};
+  border-radius: ${props => props.theme.borderRadius.lg};
+  padding: ${props => props.theme.spacing[5]};
   text-align: center;
-  margin-top: 20px;
+  margin-top: ${props => props.theme.spacing[5]};
+  box-shadow: ${props => props.theme.shadows.md};
+  border: 1px dashed ${props => props.theme.colors.border};
+`;
+
+const EmptyStateIcon = styled(FaUserFriends)`
+  font-size: 48px;
+  color: ${props => props.theme.colors.primary};
+  margin-bottom: ${props => props.theme.spacing[3]};
+  opacity: 0.7;
+`;
+
+const EmptyStateTitle = styled.h3`
+  font-size: ${props => props.theme.fontSizes.xl};
+  color: ${props => props.theme.colors.textDark};
+  margin-bottom: ${props => props.theme.spacing[2]};
+`;
+
+const EmptyStateText = styled.p`
+  color: ${props => props.theme.colors.textLight};
+  margin-bottom: ${props => props.theme.spacing[4]};
+`;
+
+const LoadingContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: ${props => props.theme.spacing[6]};
+`;
+
+const LoadingText = styled.p`
+  margin-top: ${props => props.theme.spacing[4]};
+  color: ${props => props.theme.colors.textLight};
+  font-size: ${props => props.theme.fontSizes.lg};
 `;
 
 const TestNotificationButton = styled.button`
-  background-color: #e67e22; /* Orange */
+  background-color: ${props => props.theme.colors.accent};
   color: white;
   border: none;
-  border-radius: 8px;
-  padding: 12px 24px;
-  font-size: 16px;
-  font-weight: bold;
+  border-radius: ${props => props.theme.borderRadius.md};
+  padding: ${props => props.theme.spacing[2]} ${props => props.theme.spacing[4]};
+  font-size: ${props => props.theme.fontSizes.sm};
+  font-weight: ${props => props.theme.fontWeights.medium};
   cursor: pointer;
-  margin-top: 20px;
-  margin-bottom: 20px;
+  margin-top: ${props => props.theme.spacing[5]};
+  margin-bottom: ${props => props.theme.spacing[5]};
   transition: all 0.3s ease;
   
   &:hover {
-    background-color: #d35400;
+    background-color: ${props => props.theme.colors.accentDark};
     transform: scale(1.05);
   }
 `;
@@ -156,7 +246,6 @@ const Home: React.FC = () => {
         const data = await getActiveStatuses();
         setStatuses(data || []);
       } catch (error) {
-        console.error('Error fetching statuses:', error);
         // Fallback to mock data if Supabase fails
         setStatuses(fallbackMockStatuses);
       } finally {
@@ -173,7 +262,7 @@ const Home: React.FC = () => {
         event: '*', 
         schema: 'public', 
         table: 'statuses' 
-      }, (payload: any) => {
+      }, () => {
         fetchStatuses();
       })
       .subscribe();
@@ -185,7 +274,6 @@ const Home: React.FC = () => {
 
   const handleCheckIn = async (data: { placeId: string; activity: string; privacy: 'all' | 'intended' | 'specific' }) => {
     if (!user) {
-      console.error('User not authenticated');
       return;
     }
 
@@ -193,14 +281,25 @@ const Home: React.FC = () => {
       await checkIn(user.id, data.placeId, data.activity, data.privacy);
       // The real-time subscription will update the UI
       setIsModalOpen(false);
+      
+      // Add a notification for successful check-in
+      addNotification({
+        title: 'Check-in Successful',
+        message: `You've checked in at ${statuses.find(s => s.place_id === data.placeId)?.places?.name || 'a place'}`,
+        type: 'system'
+      });
     } catch (error) {
-      console.error('Error checking in:', error);
+      // Add error notification
+      addNotification({
+        title: 'Check-in Failed',
+        message: 'There was an error checking in. Please try again.',
+        type: 'system'
+      });
     }
   };
 
   const handleJoin = (status: Status) => {
     if (!user) {
-      console.error('User not authenticated');
       return;
     }
 
@@ -208,6 +307,13 @@ const Home: React.FC = () => {
       placeId: status.place_id,
       activity: status.activity,
       privacy: 'all'
+    });
+    
+    // Add notification for joining
+    addNotification({
+      title: 'Joined Activity',
+      message: `You've joined ${status.users_view?.username || 'a friend'} at ${status.places?.name || 'a place'}`,
+      type: 'system'
     });
   };
 
@@ -235,27 +341,52 @@ const Home: React.FC = () => {
     alert('Test notification sent! Check the notification bell in the top right corner.');
   };
 
+  const renderLoading = () => (
+    <LoadingContainer>
+      <div className="loading-spinner"></div>
+      <LoadingText>Loading statuses...</LoadingText>
+    </LoadingContainer>
+  );
+
+  const renderEmptyState = () => (
+    <EmptyState className="fade-in">
+      <EmptyStateIcon className="floating" />
+      <EmptyStateTitle>No active statuses yet</EmptyStateTitle>
+      <EmptyStateText>
+        Your friends will appear here when they check in. 
+        Be the first to share your location!
+      </EmptyStateText>
+      <CheckInButton onClick={() => setIsModalOpen(true)}>
+        <PlusIcon /> Check In Now
+      </CheckInButton>
+    </EmptyState>
+  );
+
   return (
     <HomeContainer>
-      <h1>Bump</h1>
-      <p>See where your friends are hanging out</p>
+      <Header className="fade-in">
+        <Title>Bump</Title>
+        <Subtitle>See where your friends are hanging out</Subtitle>
+      </Header>
       
-      <TestNotificationButton onClick={sendTestNotification}>
+      <TestNotificationButton onClick={sendTestNotification} className="slide-in-right">
         Send Test Notification
       </TestNotificationButton>
       
       <StatusList>
         {loading ? (
-          <p>Loading statuses...</p>
+          renderLoading()
         ) : statuses.length === 0 ? (
-          <EmptyState>
-            <p>No active statuses yet. Your friends will appear here when they check in.</p>
-          </EmptyState>
+          renderEmptyState()
         ) : (
-          Object.entries(statusesByPlace).map(([placeName, placeStatuses]) => (
-            <StatusGroup key={placeName}>
-              <PlaceHeading>{placeName} ({placeStatuses.length})</PlaceHeading>
-              {placeStatuses.map(status => (
+          Object.entries(statusesByPlace).map(([placeName, placeStatuses], index) => (
+            <StatusGroup key={placeName} style={{ animationDelay: `${index * 0.1}s` }}>
+              <PlaceHeading>
+                <PlaceIcon />
+                <PlaceName>{placeName}</PlaceName>
+                <PlaceCount>{placeStatuses.length}</PlaceCount>
+              </PlaceHeading>
+              {placeStatuses.map((status, statusIndex) => (
                 <StatusCard 
                   key={status.id} 
                   status={status} 
@@ -267,9 +398,14 @@ const Home: React.FC = () => {
         )}
       </StatusList>
       
-      <CheckInButton onClick={() => setIsModalOpen(true)}>
-        Check In
-      </CheckInButton>
+      {!loading && statuses.length > 0 && (
+        <CheckInButton 
+          onClick={() => setIsModalOpen(true)}
+          className="pulse-on-hover"
+        >
+          <PlusIcon /> Check In
+        </CheckInButton>
+      )}
       
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
         <CheckInForm 

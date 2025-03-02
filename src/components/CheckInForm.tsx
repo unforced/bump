@@ -2,94 +2,163 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { getPlaces } from '../services/supabase';
 import { Place } from '../types';
+import { FaMapMarkerAlt, FaUserFriends, FaUserSecret } from 'react-icons/fa';
 
 const FormContainer = styled.div`
-  background-color: var(--secondary-color);
-  border-radius: 12px;
-  padding: 20px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  background-color: ${props => props.theme.colors.secondary};
+  border-radius: ${props => props.theme.borderRadius.lg};
+  padding: ${props => props.theme.spacing[5]};
+  box-shadow: ${props => props.theme.shadows.md};
   width: 100%;
   max-width: 500px;
   margin: 0 auto;
 `;
 
 const FormTitle = styled.h2`
-  margin-bottom: 20px;
+  margin-bottom: ${props => props.theme.spacing[4]};
   text-align: center;
+  color: ${props => props.theme.colors.primary};
+  font-size: ${props => props.theme.fontSizes['2xl']};
 `;
 
 const FormGroup = styled.div`
-  margin-bottom: 16px;
+  margin-bottom: ${props => props.theme.spacing[4]};
 `;
 
 const Label = styled.label`
   display: block;
-  margin-bottom: 8px;
-  font-weight: 500;
+  margin-bottom: ${props => props.theme.spacing[2]};
+  font-weight: ${props => props.theme.fontWeights.medium};
+  color: ${props => props.theme.colors.textDark};
 `;
 
 const Select = styled.select`
   width: 100%;
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  background-color: white;
-  font-size: 16px;
+  padding: ${props => props.theme.spacing[3]};
+  border: 1px solid ${props => props.theme.colors.border};
+  border-radius: ${props => props.theme.borderRadius.md};
+  background-color: ${props => props.theme.colors.background};
+  font-size: ${props => props.theme.fontSizes.md};
+  color: ${props => props.theme.colors.text};
+  transition: all 0.3s ease;
+  
+  &:focus {
+    outline: none;
+    border-color: ${props => props.theme.colors.primary};
+    box-shadow: 0 0 0 2px ${props => props.theme.colors.primaryLight};
+  }
+  
+  &:disabled {
+    background-color: ${props => props.theme.colors.backgroundAlt};
+    cursor: not-allowed;
+  }
 `;
 
 const Input = styled.input`
   width: 100%;
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  font-size: 16px;
+  padding: ${props => props.theme.spacing[3]};
+  border: 1px solid ${props => props.theme.colors.border};
+  border-radius: ${props => props.theme.borderRadius.md};
+  font-size: ${props => props.theme.fontSizes.md};
+  color: ${props => props.theme.colors.text};
+  transition: all 0.3s ease;
+  
+  &:focus {
+    outline: none;
+    border-color: ${props => props.theme.colors.primary};
+    box-shadow: 0 0 0 2px ${props => props.theme.colors.primaryLight};
+  }
 `;
 
 const RadioGroup = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: ${props => props.theme.spacing[3]};
 `;
 
 const RadioOption = styled.label`
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: ${props => props.theme.spacing[2]};
   cursor: pointer;
+  padding: ${props => props.theme.spacing[2]};
+  border-radius: ${props => props.theme.borderRadius.md};
+  transition: all 0.3s ease;
+  
+  &:hover {
+    background-color: ${props => props.theme.colors.backgroundAlt};
+  }
+  
+  input {
+    accent-color: ${props => props.theme.colors.primary};
+  }
+`;
+
+const RadioLabel = styled.span`
+  font-size: ${props => props.theme.fontSizes.md};
+  color: ${props => props.theme.colors.text};
+`;
+
+const RadioIcon = styled.span`
+  color: ${props => props.theme.colors.primary};
+  display: flex;
+  align-items: center;
 `;
 
 const ButtonGroup = styled.div`
   display: flex;
   justify-content: space-between;
-  margin-top: 24px;
+  margin-top: ${props => props.theme.spacing[5]};
 `;
 
 const Button = styled.button`
-  padding: 12px 24px;
+  padding: ${props => props.theme.spacing[3]} ${props => props.theme.spacing[5]};
   border: none;
-  border-radius: 8px;
-  font-size: 16px;
+  border-radius: ${props => props.theme.borderRadius.md};
+  font-size: ${props => props.theme.fontSizes.md};
+  font-weight: ${props => props.theme.fontWeights.medium};
   cursor: pointer;
   transition: all 0.3s ease;
 `;
 
 const CancelButton = styled(Button)`
-  background-color: #f1f1f1;
-  color: #333;
+  background-color: ${props => props.theme.colors.backgroundAlt};
+  color: ${props => props.theme.colors.text};
   
   &:hover {
-    background-color: #e1e1e1;
+    background-color: ${props => props.theme.colors.border};
+    transform: translateY(-2px);
+  }
+  
+  &:active {
+    transform: translateY(0);
   }
 `;
 
 const SubmitButton = styled(Button)`
-  background-color: var(--primary-color);
+  background-color: ${props => props.theme.colors.primary};
   color: white;
   
   &:hover {
-    background-color: #3a6a49;
-    transform: scale(1.05);
+    background-color: ${props => props.theme.colors.primaryDark};
+    transform: translateY(-2px);
+    box-shadow: ${props => props.theme.shadows.md};
   }
+  
+  &:active {
+    transform: translateY(0);
+  }
+`;
+
+const LoadingSpinner = styled.div`
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: white;
+  animation: spin 1s ease-in-out infinite;
+  margin-right: ${props => props.theme.spacing[2]};
 `;
 
 // Fallback mock data in case Supabase connection fails
@@ -115,6 +184,7 @@ const CheckInForm: React.FC<CheckInFormProps> = ({ onClose, onSubmit }) => {
   const [privacy, setPrivacy] = useState<'all' | 'intended' | 'specific'>('all');
   const [places, setPlaces] = useState<Place[]>([]);
   const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     const fetchPlaces = async () => {
@@ -123,7 +193,6 @@ const CheckInForm: React.FC<CheckInFormProps> = ({ onClose, onSubmit }) => {
         const data = await getPlaces();
         setPlaces(data || []);
       } catch (error) {
-        console.error('Error fetching places:', error);
         // Fallback to mock data if Supabase fails
         setPlaces(fallbackPlaces);
       } finally {
@@ -134,19 +203,25 @@ const CheckInForm: React.FC<CheckInFormProps> = ({ onClose, onSubmit }) => {
     fetchPlaces();
   }, []);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!placeId || !activity) return;
     
-    onSubmit({
-      placeId,
-      activity,
-      privacy
-    });
+    setSubmitting(true);
+    
+    try {
+      await onSubmit({
+        placeId,
+        activity,
+        privacy
+      });
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
-    <FormContainer>
+    <FormContainer className="scale">
       <FormTitle>Check In</FormTitle>
       <form onSubmit={handleSubmit}>
         <FormGroup>
@@ -157,6 +232,7 @@ const CheckInForm: React.FC<CheckInFormProps> = ({ onClose, onSubmit }) => {
             onChange={(e) => setPlaceId(e.target.value)}
             required
             disabled={loading}
+            className={loading ? "shimmer" : ""}
           >
             <option value="">Select a place</option>
             {places.map(place => (
@@ -191,7 +267,8 @@ const CheckInForm: React.FC<CheckInFormProps> = ({ onClose, onSubmit }) => {
                 checked={privacy === 'all'} 
                 onChange={() => setPrivacy('all')} 
               />
-              <span>All friends</span>
+              <RadioIcon><FaUserFriends /></RadioIcon>
+              <RadioLabel>All friends</RadioLabel>
             </RadioOption>
             <RadioOption>
               <input 
@@ -202,7 +279,8 @@ const CheckInForm: React.FC<CheckInFormProps> = ({ onClose, onSubmit }) => {
                 checked={privacy === 'intended'} 
                 onChange={() => setPrivacy('intended')} 
               />
-              <span>Only friends who intend to bump with me</span>
+              <RadioIcon><FaMapMarkerAlt /></RadioIcon>
+              <RadioLabel>Only friends who intend to bump with me</RadioLabel>
             </RadioOption>
             <RadioOption>
               <input 
@@ -213,17 +291,24 @@ const CheckInForm: React.FC<CheckInFormProps> = ({ onClose, onSubmit }) => {
                 checked={privacy === 'specific'} 
                 onChange={() => setPrivacy('specific')} 
               />
-              <span>Specific friends (coming soon)</span>
+              <RadioIcon><FaUserSecret /></RadioIcon>
+              <RadioLabel>Specific friends (coming soon)</RadioLabel>
             </RadioOption>
           </RadioGroup>
         </FormGroup>
         
         <ButtonGroup>
-          <CancelButton type="button" onClick={onClose}>
+          <CancelButton type="button" onClick={onClose} disabled={submitting}>
             Cancel
           </CancelButton>
-          <SubmitButton type="submit">
-            Check In
+          <SubmitButton type="submit" disabled={submitting} className={submitting ? "" : "pulse-on-hover"}>
+            {submitting ? (
+              <>
+                <LoadingSpinner /> Checking In...
+              </>
+            ) : (
+              "Check In"
+            )}
           </SubmitButton>
         </ButtonGroup>
       </form>

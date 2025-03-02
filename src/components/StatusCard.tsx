@@ -2,17 +2,20 @@ import React from 'react';
 import styled from 'styled-components';
 import { Status } from '../types';
 import { useAuth } from '../contexts/AuthContext';
+import { FaMapMarkerAlt, FaUserFriends } from 'react-icons/fa';
 
 const Card = styled.div`
-  background-color: var(--secondary-color);
-  border-radius: 12px;
-  padding: 16px;
-  margin-bottom: 16px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease;
+  background-color: ${props => props.theme.colors.secondary};
+  border-radius: ${props => props.theme.borderRadius.lg};
+  padding: ${props => props.theme.spacing[4]};
+  margin-bottom: ${props => props.theme.spacing[4]};
+  box-shadow: ${props => props.theme.shadows.md};
+  transition: all 0.3s ease;
+  border-left: 4px solid ${props => props.theme.colors.primary};
   
   &:hover {
     transform: translateY(-3px);
+    box-shadow: ${props => props.theme.shadows.lg};
   }
 `;
 
@@ -20,51 +23,114 @@ const CardHeader = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 8px;
+  margin-bottom: ${props => props.theme.spacing[2]};
+`;
+
+const UserInfo = styled.div`
+  display: flex;
+  align-items: center;
+  gap: ${props => props.theme.spacing[2]};
+`;
+
+const UserAvatar = styled.div`
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: ${props => props.theme.colors.primary};
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: ${props => props.theme.fontWeights.bold};
+  font-size: ${props => props.theme.fontSizes.sm};
 `;
 
 const UserName = styled.h3`
   margin: 0;
-  font-size: 1.1rem;
+  font-size: ${props => props.theme.fontSizes.lg};
+  color: ${props => props.theme.colors.text};
+  display: flex;
+  align-items: center;
 `;
 
 const TimeStamp = styled.span`
-  font-size: 0.8rem;
-  color: #666;
+  font-size: ${props => props.theme.fontSizes.xs};
+  color: ${props => props.theme.colors.textLight};
+  background-color: ${props => props.theme.colors.backgroundAlt};
+  padding: ${props => props.theme.spacing[1]} ${props => props.theme.spacing[2]};
+  border-radius: ${props => props.theme.borderRadius.full};
 `;
 
-const PlaceName = styled.div`
-  font-weight: 500;
-  margin-bottom: 4px;
+const StatusContent = styled.div`
+  margin: ${props => props.theme.spacing[3]} 0;
+`;
+
+const PlaceInfo = styled.div`
+  display: flex;
+  align-items: center;
+  gap: ${props => props.theme.spacing[2]};
+  font-weight: ${props => props.theme.fontWeights.medium};
+  margin-bottom: ${props => props.theme.spacing[2]};
+  color: ${props => props.theme.colors.textDark};
+`;
+
+const PlaceIcon = styled(FaMapMarkerAlt)`
+  color: ${props => props.theme.colors.primary};
 `;
 
 const Activity = styled.div`
-  margin-bottom: 12px;
+  margin-bottom: ${props => props.theme.spacing[3]};
+  font-size: ${props => props.theme.fontSizes.md};
+  color: ${props => props.theme.colors.text};
+  line-height: ${props => props.theme.lineHeights.relaxed};
+  font-style: italic;
+`;
+
+const PrivacyInfo = styled.div`
+  display: flex;
+  align-items: center;
+  gap: ${props => props.theme.spacing[1]};
+  font-size: ${props => props.theme.fontSizes.xs};
+  color: ${props => props.theme.colors.textLight};
+  margin-bottom: ${props => props.theme.spacing[3]};
+`;
+
+const PrivacyIcon = styled(FaUserFriends)`
+  font-size: ${props => props.theme.fontSizes.sm};
 `;
 
 const JoinButton = styled.button`
-  background-color: var(--primary-color);
+  background-color: ${props => props.theme.colors.primary};
   color: white;
   border: none;
-  border-radius: 8px;
-  padding: 8px 16px;
-  font-size: 14px;
+  border-radius: ${props => props.theme.borderRadius.md};
+  padding: ${props => props.theme.spacing[2]} ${props => props.theme.spacing[4]};
+  font-size: ${props => props.theme.fontSizes.sm};
+  font-weight: ${props => props.theme.fontWeights.medium};
   cursor: pointer;
   transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: ${props => props.theme.spacing[2]};
   
   &:hover {
-    background-color: #3a6a49;
+    background-color: ${props => props.theme.colors.primaryDark};
     transform: scale(1.05);
+  }
+  
+  &:active {
+    transform: scale(0.98);
   }
 `;
 
 const SelfTag = styled.span`
-  background-color: #4a7c59;
+  background-color: ${props => props.theme.colors.primary};
   color: white;
-  font-size: 0.7rem;
-  padding: 2px 6px;
-  border-radius: 4px;
-  margin-left: 8px;
+  font-size: ${props => props.theme.fontSizes.xs};
+  padding: ${props => props.theme.spacing[1]} ${props => props.theme.spacing[2]};
+  border-radius: ${props => props.theme.borderRadius.full};
+  margin-left: ${props => props.theme.spacing[2]};
 `;
 
 interface StatusCardProps {
@@ -79,6 +145,13 @@ const StatusCard: React.FC<StatusCardProps> = ({ status, onJoin }) => {
   // Format timestamp to a readable format
   const formatTime = (timestamp: string) => {
     const date = new Date(timestamp);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    
+    if (diffMins < 1) return 'Just now';
+    if (diffMins < 60) return `${diffMins}m ago`;
+    
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
   
@@ -101,21 +174,58 @@ const StatusCard: React.FC<StatusCardProps> = ({ status, onJoin }) => {
     // Fallback to email or anonymous
     return status.users_view?.email?.split('@')[0] || 'Anonymous';
   };
+
+  // Get user initials for avatar
+  const getUserInitials = () => {
+    const name = getUserName();
+    if (name === 'You') return 'Y';
+    
+    return name.charAt(0).toUpperCase();
+  };
+  
+  // Get privacy label
+  const getPrivacyLabel = () => {
+    switch (status.privacy) {
+      case 'all':
+        return 'Visible to all friends';
+      case 'intended':
+        return 'Visible to friends who intend to bump';
+      case 'specific':
+        return 'Visible to specific friends';
+      default:
+        return 'Visible to all friends';
+    }
+  };
   
   return (
-    <Card>
+    <Card className="fade-in">
       <CardHeader>
-        <UserName>
-          {getUserName()}
-          {isCurrentUser && <SelfTag>You</SelfTag>}
-        </UserName>
+        <UserInfo>
+          <UserAvatar>{getUserInitials()}</UserAvatar>
+          <UserName>
+            {getUserName()}
+            {isCurrentUser && <SelfTag>You</SelfTag>}
+          </UserName>
+        </UserInfo>
         <TimeStamp>{formatTime(status.timestamp)}</TimeStamp>
       </CardHeader>
-      <PlaceName>{status.places?.name || 'Unknown location'}</PlaceName>
-      <Activity>{status.activity}</Activity>
+      
+      <StatusContent>
+        <PlaceInfo>
+          <PlaceIcon /> {status.places?.name || 'Unknown location'}
+        </PlaceInfo>
+        <Activity>"{status.activity}"</Activity>
+        <PrivacyInfo>
+          <PrivacyIcon /> {getPrivacyLabel()}
+        </PrivacyInfo>
+      </StatusContent>
+      
       {!isCurrentUser && (
-        <JoinButton onClick={() => onJoin(status)}>
-          Join
+        <JoinButton 
+          onClick={() => onJoin(status)}
+          className="pulse-on-hover"
+        >
+          Join {getUserName()}
         </JoinButton>
       )}
     </Card>
