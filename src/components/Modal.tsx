@@ -22,7 +22,7 @@ const ModalOverlay = styled.div<{ isOpen: boolean }>`
 const ModalContainer = styled.div<{ isOpen: boolean }>`
   background-color: ${props => props.theme.colors.background};
   border-radius: ${props => props.theme.radii.lg};
-  padding: ${props => props.theme.spacing[4]};
+  padding: ${props => props.theme.space[4]};
   max-width: 90%;
   max-height: 90vh;
   overflow-y: auto;
@@ -35,8 +35,8 @@ const ModalContainer = styled.div<{ isOpen: boolean }>`
 
 const CloseButton = styled.button`
   position: absolute;
-  top: ${props => props.theme.spacing[3]};
-  right: ${props => props.theme.spacing[3]};
+  top: ${props => props.theme.space[3]};
+  right: ${props => props.theme.space[3]};
   background: none;
   border: none;
   color: ${props => props.theme.colors.textLight};
