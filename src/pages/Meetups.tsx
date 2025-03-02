@@ -1,264 +1,396 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { getMeetups, logMeetup, getPlaces } from '../services/supabase';
+import { getMeetups, logMeetup, getUserPlaces } from '../services/supabase';
 import { Meetup, Place } from '../types';
-import Modal from '../components/Modal';
 import { useAuth } from '../contexts/AuthContext';
+import { motion } from 'framer-motion';
 
-const MeetupsContainer = styled.div`
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+const PageContainer = styled.div`
+  padding: ${({ theme }) => theme.space[6]};
+  max-width: 800px;
+  margin: 0 auto;
+`;
+
+const PageHeader = styled.div`
+  margin-bottom: ${({ theme }) => theme.space[6]};
   text-align: center;
 `;
 
-const MeetupsList = styled.div`
-  margin-top: 20px;
-  width: 100%;
-  max-width: 500px;
+const PageTitle = styled.h1`
+  color: ${({ theme }) => theme.colors.text};
+  font-size: ${({ theme }) => theme.fontSizes.xl};
+  margin-bottom: ${({ theme }) => theme.space[2]};
 `;
 
-const MeetupCard = styled.div`
-  background-color: var(--secondary-color);
-  border-radius: 12px;
-  padding: 16px;
-  margin-bottom: 16px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  text-align: left;
+const PageDescription = styled.p`
+  color: ${({ theme }) => theme.colors.textLight};
+  font-size: ${({ theme }) => theme.fontSizes.md};
+  max-width: 600px;
+  margin: 0 auto;
+`;
+
+const StatsContainer = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: ${({ theme }) => theme.space[4]};
+  margin-bottom: ${({ theme }) => theme.space[6]};
+`;
+
+const StatCard = styled.div`
+  background-color: ${({ theme }) => theme.colors.backgroundAlt};
+  border-radius: ${({ theme }) => theme.radii.lg};
+  padding: ${({ theme }) => theme.space[4]};
+  text-align: center;
+  box-shadow: ${({ theme }) => theme.shadows.sm};
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: ${({ theme }) => theme.shadows.md};
+  }
+`;
+
+const StatValue = styled.div`
+  font-size: ${({ theme }) => theme.fontSizes.xl};
+  font-weight: ${({ theme }) => theme.fontWeights.bold};
+  color: ${({ theme }) => theme.colors.primary};
+  margin-bottom: ${({ theme }) => theme.space[2]};
+`;
+
+const StatLabel = styled.div`
+  font-size: ${({ theme }) => theme.fontSizes.sm};
+  color: ${({ theme }) => theme.colors.textLight};
+`;
+
+const MeetupsList = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: ${({ theme }) => theme.space[4]};
+  margin-bottom: ${({ theme }) => theme.space[6]};
+`;
+
+const MeetupCard = styled(motion.div)`
+  background-color: ${({ theme }) => theme.colors.background};
+  border-radius: ${({ theme }) => theme.radii.lg};
+  padding: ${({ theme }) => theme.space[4]};
+  box-shadow: ${({ theme }) => theme.shadows.sm};
+  border: 1px solid ${({ theme }) => theme.colors.border};
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: ${({ theme }) => theme.shadows.md};
+  }
 `;
 
 const MeetupHeader = styled.div`
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
+  align-items: flex-start;
+  margin-bottom: ${({ theme }) => theme.space[3]};
 `;
 
 const MeetupTitle = styled.h3`
+  color: ${({ theme }) => theme.colors.text};
+  font-size: ${({ theme }) => theme.fontSizes.lg};
   margin: 0;
-  font-size: 1.1rem;
 `;
 
 const MeetupDate = styled.span`
-  font-size: 0.8rem;
-  color: #666;
+  color: ${({ theme }) => theme.colors.textLight};
+  font-size: ${({ theme }) => theme.fontSizes.sm};
 `;
 
 const MeetupLocation = styled.div`
-  font-weight: 500;
-  margin-bottom: 4px;
+  color: ${({ theme }) => theme.colors.text};
+  font-size: ${({ theme }) => theme.fontSizes.md};
+  margin-bottom: ${({ theme }) => theme.space[3]};
+  display: flex;
+  align-items: center;
+  
+  svg {
+    margin-right: ${({ theme }) => theme.space[2]};
+    color: ${({ theme }) => theme.colors.primary};
+  }
 `;
 
 const MeetupType = styled.div<{ isIntentional: boolean }>`
   display: inline-block;
-  background-color: ${props => props.isIntentional ? '#4caf50' : '#ff9800'};
-  color: white;
-  font-size: 0.7rem;
-  padding: 2px 6px;
-  border-radius: 4px;
-  margin-top: 8px;
+  padding: ${({ theme }) => theme.space[1]} ${({ theme }) => theme.space[3]};
+  border-radius: ${({ theme }) => theme.radii.full};
+  font-size: ${({ theme }) => theme.fontSizes.sm};
+  font-weight: ${({ theme }) => theme.fontWeights.medium};
+  background-color: ${({ theme, isIntentional }) => 
+    isIntentional ? theme.colors.secondary + '20' : theme.colors.primary + '20'};
+  color: ${({ theme, isIntentional }) => 
+    isIntentional ? theme.colors.secondary : theme.colors.primary};
 `;
 
 const EmptyState = styled.div`
-  background-color: var(--secondary-color);
-  border-radius: 12px;
-  padding: 20px;
   text-align: center;
-  margin-top: 20px;
+  padding: ${({ theme }) => theme.space[8]};
+  background-color: ${({ theme }) => theme.colors.backgroundAlt};
+  border-radius: ${({ theme }) => theme.radii.lg};
+  margin-bottom: ${({ theme }) => theme.space[6]};
+`;
+
+const EmptyStateTitle = styled.h3`
+  color: ${({ theme }) => theme.colors.text};
+  font-size: ${({ theme }) => theme.fontSizes.lg};
+  margin-bottom: ${({ theme }) => theme.space[2]};
+`;
+
+const EmptyStateDescription = styled.p`
+  color: ${({ theme }) => theme.colors.textLight};
+  font-size: ${({ theme }) => theme.fontSizes.md};
+  margin-bottom: ${({ theme }) => theme.space[4]};
 `;
 
 const LogMeetupButton = styled.button`
-  background-color: var(--primary-color);
+  background-color: ${({ theme }) => theme.colors.primary};
   color: white;
   border: none;
-  border-radius: 8px;
-  padding: 12px 24px;
-  font-size: 16px;
+  border-radius: ${({ theme }) => theme.radii.full};
+  padding: ${({ theme }) => theme.space[3]} ${({ theme }) => theme.space[6]};
+  font-size: ${({ theme }) => theme.fontSizes.md};
+  font-weight: ${({ theme }) => theme.fontWeights.medium};
   cursor: pointer;
-  margin-top: 20px;
-  transition: all 0.3s ease;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  box-shadow: ${({ theme }) => theme.shadows.md};
   
   &:hover {
-    background-color: #3a6a49;
-    transform: scale(1.05);
+    background-color: ${({ theme }) => theme.colors.primaryDark};
+    transform: translateY(-2px);
+  }
+  
+  &:active {
+    transform: translateY(0);
+  }
+  
+  svg {
+    margin-right: ${({ theme }) => theme.space[2]};
+  }
+`;
+
+const Modal = styled.div<{ $isOpen: boolean }>`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: ${({ $isOpen }) => ($isOpen ? 'flex' : 'none')};
+  justify-content: center;
+  align-items: center;
+  z-index: ${({ theme }) => theme.zIndices.modal};
+`;
+
+const ModalContent = styled.div`
+  background-color: ${({ theme }) => theme.colors.background};
+  border-radius: ${({ theme }) => theme.radii.lg};
+  padding: ${({ theme }) => theme.space[6]};
+  width: 90%;
+  max-width: 500px;
+  box-shadow: ${({ theme }) => theme.shadows.lg};
+  position: relative;
+`;
+
+const ModalHeader = styled.div`
+  margin-bottom: ${({ theme }) => theme.space[4]};
+  text-align: center;
+`;
+
+const ModalTitle = styled.h2`
+  color: ${({ theme }) => theme.colors.text};
+  font-size: ${({ theme }) => theme.fontSizes.lg};
+  margin: 0;
+`;
+
+const CloseButton = styled.button`
+  position: absolute;
+  top: ${({ theme }) => theme.space[4]};
+  right: ${({ theme }) => theme.space[4]};
+  background: none;
+  border: none;
+  font-size: ${({ theme }) => theme.fontSizes.lg};
+  color: ${({ theme }) => theme.colors.textLight};
+  cursor: pointer;
+  
+  &:hover {
+    color: ${({ theme }) => theme.colors.text};
   }
 `;
 
 const Form = styled.form`
-  width: 100%;
-  max-width: 400px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
 `;
 
 const FormGroup = styled.div`
-  display: flex;
-  flex-direction: column;
-  text-align: left;
+  margin-bottom: ${({ theme }) => theme.space[4]};
 `;
 
 const Label = styled.label`
-  margin-bottom: 8px;
-  font-weight: 500;
+  display: block;
+  margin-bottom: ${({ theme }) => theme.space[2]};
+  color: ${({ theme }) => theme.colors.text};
+  font-size: ${({ theme }) => theme.fontSizes.md};
 `;
 
 const Input = styled.input`
-  padding: 10px;
-  border-radius: 8px;
-  border: 1px solid #ddd;
-  font-size: 16px;
+  width: 100%;
+  padding: ${({ theme }) => theme.space[3]};
+  border: 1px solid ${({ theme }) => theme.colors.border};
+  border-radius: ${({ theme }) => theme.radii.md};
+  font-size: ${({ theme }) => theme.fontSizes.md};
+  background-color: ${({ theme }) => theme.colors.background};
+  color: ${({ theme }) => theme.colors.text};
   
   &:focus {
     outline: none;
-    border-color: var(--primary-color);
+    border-color: ${({ theme }) => theme.colors.primary};
+    box-shadow: 0 0 0 2px ${({ theme }) => theme.colors.primary}30;
   }
 `;
 
 const Select = styled.select`
-  padding: 10px;
-  border-radius: 8px;
-  border: 1px solid #ddd;
-  font-size: 16px;
+  width: 100%;
+  padding: ${({ theme }) => theme.space[3]};
+  border: 1px solid ${({ theme }) => theme.colors.border};
+  border-radius: ${({ theme }) => theme.radii.md};
+  font-size: ${({ theme }) => theme.fontSizes.md};
+  background-color: ${({ theme }) => theme.colors.background};
+  color: ${({ theme }) => theme.colors.text};
   
   &:focus {
     outline: none;
-    border-color: var(--primary-color);
+    border-color: ${({ theme }) => theme.colors.primary};
+    box-shadow: 0 0 0 2px ${({ theme }) => theme.colors.primary}30;
   }
 `;
 
 const Checkbox = styled.div`
   display: flex;
   align-items: center;
-  gap: 8px;
+  
+  input {
+    margin-right: ${({ theme }) => theme.space[2]};
+  }
 `;
 
 const SubmitButton = styled.button`
-  background-color: var(--primary-color);
+  background-color: ${({ theme }) => theme.colors.primary};
   color: white;
   border: none;
-  border-radius: 8px;
-  padding: 12px;
-  font-size: 16px;
+  border-radius: ${({ theme }) => theme.radii.md};
+  padding: ${({ theme }) => theme.space[3]};
+  font-size: ${({ theme }) => theme.fontSizes.md};
+  font-weight: ${({ theme }) => theme.fontWeights.medium};
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background-color 0.2s ease;
   
   &:hover {
-    background-color: #3a6a49;
+    background-color: ${({ theme }) => theme.colors.primaryDark};
   }
   
   &:disabled {
-    background-color: #cccccc;
+    background-color: ${({ theme }) => theme.colors.border};
     cursor: not-allowed;
   }
 `;
 
-const LoadingSpinner = styled.div`
-  border: 4px solid #f3f3f3;
-  border-top: 4px solid var(--primary-color);
-  border-radius: 50%;
-  width: 30px;
-  height: 30px;
-  animation: spin 1s linear infinite;
-  margin: 20px auto;
-  
-  @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-  }
-`;
-
 const ErrorMessage = styled.div`
-  color: #d32f2f;
-  background-color: #ffebee;
-  padding: 12px;
-  border-radius: 8px;
-  margin-bottom: 16px;
-  width: 100%;
-  max-width: 500px;
-  text-align: center;
+  color: ${({ theme }) => theme.colors.error};
+  background-color: ${({ theme }) => theme.colors.error}10;
+  padding: ${({ theme }) => theme.space[3]};
+  border-radius: ${({ theme }) => theme.radii.md};
+  margin-bottom: ${({ theme }) => theme.space[4]};
+  font-size: ${({ theme }) => theme.fontSizes.sm};
 `;
 
 const SuccessMessage = styled.div`
-  color: #2e7d32;
-  background-color: #e8f5e9;
-  padding: 12px;
-  border-radius: 8px;
-  margin-bottom: 16px;
-  width: 100%;
-  max-width: 500px;
-  text-align: center;
+  color: ${({ theme }) => theme.colors.success};
+  background-color: ${({ theme }) => theme.colors.success}10;
+  padding: ${({ theme }) => theme.space[3]};
+  border-radius: ${({ theme }) => theme.radii.md};
+  margin-bottom: ${({ theme }) => theme.space[4]};
+  font-size: ${({ theme }) => theme.fontSizes.sm};
 `;
 
-// New styled components for statistics
-const StatsContainer = styled.div`
+const LoadingIndicator = styled.div`
   display: flex;
-  flex-wrap: wrap;
   justify-content: center;
-  gap: 16px;
-  margin: 20px 0;
-  width: 100%;
-  max-width: 500px;
-`;
-
-const StatCard = styled.div`
-  background-color: var(--secondary-color);
-  border-radius: 12px;
-  padding: 16px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  flex: 1;
-  min-width: 140px;
-  text-align: center;
-  transition: transform 0.3s ease;
+  align-items: center;
+  padding: ${({ theme }) => theme.space[6]};
   
-  &:hover {
-    transform: translateY(-5px);
+  &:after {
+    content: "";
+    width: 40px;
+    height: 40px;
+    border: 4px solid ${({ theme }) => theme.colors.border};
+    border-top-color: ${({ theme }) => theme.colors.primary};
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+  
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
   }
 `;
 
-const StatValue = styled.div`
-  font-size: 2rem;
-  font-weight: bold;
-  color: var(--primary-color);
-  margin-bottom: 8px;
-`;
-
-const StatLabel = styled.div`
-  font-size: 0.9rem;
-  color: #666;
+const SectionTitle = styled.h2`
+  color: ${({ theme }) => theme.colors.text};
+  font-size: ${({ theme }) => theme.fontSizes.lg};
+  margin-top: ${({ theme }) => theme.space[6]};
+  margin-bottom: ${({ theme }) => theme.space[4]};
+  position: relative;
+  display: inline-block;
+  
+  &:after {
+    content: '';
+    position: absolute;
+    bottom: -${({ theme }) => theme.space[2]};
+    left: 0;
+    width: 40px;
+    height: 3px;
+    background-color: ${({ theme }) => theme.colors.primary};
+    border-radius: ${({ theme }) => theme.radii.full};
+  }
 `;
 
 const Meetups: React.FC = () => {
+  const { user } = useAuth();
   const [meetups, setMeetups] = useState<Meetup[]>([]);
   const [places, setPlaces] = useState<Place[]>([]);
-  const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
-  const { user } = useAuth();
-  
-  // Form state
   const [friendName, setFriendName] = useState('');
   const [placeId, setPlaceId] = useState('');
   const [wasIntentional, setWasIntentional] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const [submitting, setSubmitting] = useState(false);
-  
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     const fetchData = async () => {
       if (!user) return;
       
       try {
         setLoading(true);
-        setError('');
+        
+        // Fetch places
+        const placesData = await getUserPlaces(user.id);
+        setPlaces(placesData?.map(up => up.places) || []);
         
         // Fetch meetups
         const meetupsData = await getMeetups(user.id);
         setMeetups(meetupsData || []);
-        
-        // Fetch places for the dropdown
-        const placesData = await getPlaces();
-        setPlaces(placesData || []);
       } catch (error) {
         console.error('Error fetching data:', error);
         setError('Failed to load data. Please try again later.');
@@ -269,11 +401,19 @@ const Meetups: React.FC = () => {
     
     fetchData();
   }, [user]);
-  
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!user || !friendName || !placeId) return;
+    if (!user) return;
+    if (!friendName.trim()) {
+      setError('Please enter a friend name');
+      return;
+    }
+    if (!placeId) {
+      setError('Please select a place');
+      return;
+    }
     
     try {
       setSubmitting(true);
@@ -289,14 +429,12 @@ const Meetups: React.FC = () => {
       setFriendName('');
       setPlaceId('');
       setWasIntentional(false);
-      
-      setSuccess('Meetup logged successfully!');
       setIsModalOpen(false);
       
+      setSuccess('Meetup logged successfully!');
+      
       // Clear success message after 3 seconds
-      setTimeout(() => {
-        setSuccess('');
-      }, 3000);
+      setTimeout(() => setSuccess(''), 3000);
     } catch (error) {
       console.error('Error logging meetup:', error);
       setError('Failed to log meetup. Please try again later.');
@@ -304,17 +442,19 @@ const Meetups: React.FC = () => {
       setSubmitting(false);
     }
   };
-  
-  const formatDate = (timestamp: string) => {
-    const date = new Date(timestamp);
-    return date.toLocaleDateString('en-US', { 
-      month: 'short', 
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return new Intl.DateTimeFormat('en-US', {
+      month: 'short',
       day: 'numeric',
-      year: 'numeric'
-    });
+      year: 'numeric',
+      hour: 'numeric',
+      minute: 'numeric',
+      hour12: true
+    }).format(date);
   };
 
-  // New functions for statistics
   const getMonthlyMeetups = () => {
     const now = new Date();
     const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
@@ -324,19 +464,19 @@ const Meetups: React.FC = () => {
       return meetupDate >= firstDayOfMonth;
     }).length;
   };
-  
+
   const getSpontaneousMeetups = () => {
     return meetups.filter(meetup => !meetup.was_intentional).length;
   };
-  
+
   const getPlannedMeetups = () => {
     return meetups.filter(meetup => meetup.was_intentional).length;
   };
-  
+
   const getMostVisitedPlace = () => {
     if (meetups.length === 0) return 'None yet';
     
-    const placeCounts: Record<string, { count: number, name: string }> = {};
+    const placeCounts: Record<string, { count: number; name: string }> = {};
     
     meetups.forEach(meetup => {
       const placeId = meetup.place_id;
@@ -346,141 +486,185 @@ const Meetups: React.FC = () => {
         placeCounts[placeId] = { count: 0, name: placeName };
       }
       
-      placeCounts[placeId].count++;
+      placeCounts[placeId].count += 1;
     });
     
-    let mostVisitedId = '';
-    let highestCount = 0;
+    let maxCount = 0;
+    let mostVisitedPlaceName = '';
     
-    Object.entries(placeCounts).forEach(([id, data]) => {
-      if (data.count > highestCount) {
-        mostVisitedId = id;
-        highestCount = data.count;
+    Object.values(placeCounts).forEach(({ count, name }) => {
+      if (count > maxCount) {
+        maxCount = count;
+        mostVisitedPlaceName = name;
       }
     });
     
-    return placeCounts[mostVisitedId]?.name || 'None';
+    return mostVisitedPlaceName;
   };
-  
+
+  const cardVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: (i: number) => ({
+      opacity: 1,
+      y: 0,
+      transition: {
+        delay: i * 0.1,
+        duration: 0.3,
+        ease: "easeOut"
+      }
+    })
+  };
+
   return (
-    <MeetupsContainer>
-      <h1>Meetups</h1>
-      <p>Log and track your spontaneous encounters</p>
+    <PageContainer>
+      <PageHeader>
+        <PageTitle>Meetups</PageTitle>
+        <PageDescription>
+          Log your spontaneous encounters and planned meetups with friends to track your social connections
+        </PageDescription>
+      </PageHeader>
       
       {error && <ErrorMessage>{error}</ErrorMessage>}
       {success && <SuccessMessage>{success}</SuccessMessage>}
       
       {loading ? (
-        <LoadingSpinner />
+        <LoadingIndicator />
       ) : (
         <>
-          {/* Statistics Section */}
           {meetups.length > 0 && (
-            <StatsContainer>
-              <StatCard>
-                <StatValue>{getMonthlyMeetups()}</StatValue>
-                <StatLabel>Meetups this month</StatLabel>
-              </StatCard>
-              <StatCard>
-                <StatValue>{getSpontaneousMeetups()}</StatValue>
-                <StatLabel>Spontaneous</StatLabel>
-              </StatCard>
-              <StatCard>
-                <StatValue>{getPlannedMeetups()}</StatValue>
-                <StatLabel>Planned</StatLabel>
-              </StatCard>
-            </StatsContainer>
+            <>
+              <StatsContainer>
+                <StatCard>
+                  <StatValue>{getMonthlyMeetups()}</StatValue>
+                  <StatLabel>Meetups this month</StatLabel>
+                </StatCard>
+                <StatCard>
+                  <StatValue>{getSpontaneousMeetups()}</StatValue>
+                  <StatLabel>Spontaneous meetups</StatLabel>
+                </StatCard>
+                <StatCard>
+                  <StatValue>{getPlannedMeetups()}</StatValue>
+                  <StatLabel>Planned meetups</StatLabel>
+                </StatCard>
+                <StatCard>
+                  <StatValue>{getMostVisitedPlace()}</StatValue>
+                  <StatLabel>Most visited place</StatLabel>
+                </StatCard>
+              </StatsContainer>
+              
+              <SectionTitle>Your Meetups</SectionTitle>
+            </>
           )}
           
-          {meetups.length > 0 && (
-            <StatCard style={{ width: '100%', maxWidth: '500px', marginBottom: '20px' }}>
-              <StatLabel>Most visited place</StatLabel>
-              <div style={{ fontSize: '1.2rem', fontWeight: 'bold', color: 'var(--primary-color)' }}>
-                {getMostVisitedPlace()}
-              </div>
-            </StatCard>
-          )}
-          
-          <MeetupsList>
-            {meetups.length === 0 ? (
-              <EmptyState>
-                <h3>No meetups yet</h3>
-                <p>Log your first meetup when you bump into a friend!</p>
-              </EmptyState>
-            ) : (
-              meetups.map(meetup => (
-                <MeetupCard key={meetup.id}>
+          {meetups.length === 0 ? (
+            <EmptyState>
+              <EmptyStateTitle>No meetups yet</EmptyStateTitle>
+              <EmptyStateDescription>
+                Log your first meetup when you bump into a friend!
+              </EmptyStateDescription>
+              <LogMeetupButton onClick={() => setIsModalOpen(true)}>
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 5v14M5 12h14"/>
+                </svg>
+                Log Your First Meetup
+              </LogMeetupButton>
+            </EmptyState>
+          ) : (
+            <MeetupsList>
+              {meetups.map((meetup, i) => (
+                <MeetupCard
+                  key={meetup.id}
+                  custom={i}
+                  initial="hidden"
+                  animate="visible"
+                  variants={cardVariants}
+                >
                   <MeetupHeader>
                     <MeetupTitle>Met {meetup.friend_name}</MeetupTitle>
                     <MeetupDate>{formatDate(meetup.timestamp)}</MeetupDate>
                   </MeetupHeader>
                   <MeetupLocation>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                      <circle cx="12" cy="10" r="3"/>
+                    </svg>
                     {meetup.places?.name || 'Unknown location'}
                   </MeetupLocation>
                   <MeetupType isIntentional={meetup.was_intentional}>
                     {meetup.was_intentional ? 'Planned' : 'Spontaneous'}
                   </MeetupType>
                 </MeetupCard>
-              ))
-            )}
-          </MeetupsList>
+              ))}
+            </MeetupsList>
+          )}
+          
+          {meetups.length > 0 && (
+            <LogMeetupButton onClick={() => setIsModalOpen(true)}>
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 5v14M5 12h14"/>
+              </svg>
+              Log Meetup
+            </LogMeetupButton>
+          )}
         </>
       )}
       
-      <LogMeetupButton onClick={() => setIsModalOpen(true)}>
-        Log Meetup
-      </LogMeetupButton>
-      
-      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
-        <h2>Log a Meetup</h2>
-        <Form onSubmit={handleSubmit}>
-          <FormGroup>
-            <Label htmlFor="friendName">Friend's Name</Label>
-            <Input
-              id="friendName"
-              type="text"
-              value={friendName}
-              onChange={(e) => setFriendName(e.target.value)}
-              placeholder="Who did you meet?"
-              required
-            />
-          </FormGroup>
+      <Modal $isOpen={isModalOpen}>
+        <ModalContent>
+          <CloseButton onClick={() => setIsModalOpen(false)}>×</CloseButton>
+          <ModalHeader>
+            <ModalTitle>Log a Meetup</ModalTitle>
+          </ModalHeader>
           
-          <FormGroup>
-            <Label htmlFor="placeId">Location</Label>
-            <Select
-              id="placeId"
-              value={placeId}
-              onChange={(e) => setPlaceId(e.target.value)}
-              required
-            >
-              <option value="">Select a location</option>
-              {places.map(place => (
-                <option key={place.id} value={place.id}>
-                  {place.name}
-                </option>
-              ))}
-            </Select>
-          </FormGroup>
-          
-          <FormGroup>
-            <Checkbox>
-              <input
-                id="wasIntentional"
-                type="checkbox"
-                checked={wasIntentional}
-                onChange={(e) => setWasIntentional(e.target.checked)}
+          <Form onSubmit={handleSubmit}>
+            <FormGroup>
+              <Label htmlFor="friendName">Friend's Name</Label>
+              <Input
+                id="friendName"
+                type="text"
+                value={friendName}
+                onChange={(e) => setFriendName(e.target.value)}
+                placeholder="Enter your friend's name"
+                required
               />
-              <Label htmlFor="wasIntentional">This was a planned meetup</Label>
-            </Checkbox>
-          </FormGroup>
-          
-          <SubmitButton type="submit" disabled={submitting}>
-            {submitting ? 'Logging...' : 'Log Meetup'}
-          </SubmitButton>
-        </Form>
+            </FormGroup>
+            
+            <FormGroup>
+              <Label htmlFor="placeId">Where did you meet?</Label>
+              <Select
+                id="placeId"
+                value={placeId}
+                onChange={(e) => setPlaceId(e.target.value)}
+                required
+              >
+                <option value="">Select a place</option>
+                {places.map((place) => (
+                  <option key={place.id} value={place.id}>
+                    {place.name}
+                  </option>
+                ))}
+              </Select>
+            </FormGroup>
+            
+            <FormGroup>
+              <Checkbox>
+                <input
+                  id="wasIntentional"
+                  type="checkbox"
+                  checked={wasIntentional}
+                  onChange={(e) => setWasIntentional(e.target.checked)}
+                />
+                <Label htmlFor="wasIntentional">This was a planned meetup</Label>
+              </Checkbox>
+            </FormGroup>
+            
+            <SubmitButton type="submit" disabled={submitting}>
+              {submitting ? 'Logging...' : 'Log Meetup'}
+            </SubmitButton>
+          </Form>
+        </ModalContent>
       </Modal>
-    </MeetupsContainer>
+    </PageContainer>
   );
 };
 
