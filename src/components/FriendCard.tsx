@@ -137,18 +137,18 @@ const FriendCard: React.FC<FriendCardProps> = ({ friend, onUpdate }) => {
   
   // Get username from friend metadata or fallback to email
   const getFriendName = () => {
-    if (friend.friend?.username) {
-      return friend.friend.username;
+    if (friend.users_view?.username) {
+      return friend.users_view.username;
     }
     
     // Try to get username from metadata if available
-    const userData = friend.friend as any; // Type assertion to access user_metadata
+    const userData = friend.users_view as any; // Type assertion to access user_metadata
     if (userData?.user_metadata?.username) {
       return userData.user_metadata.username;
     }
     
     // Fallback to email or anonymous
-    return friend.friend?.email?.split('@')[0] || 'Anonymous';
+    return friend.users_view?.email?.split('@')[0] || 'Anonymous';
   };
   
   return (
@@ -156,7 +156,7 @@ const FriendCard: React.FC<FriendCardProps> = ({ friend, onUpdate }) => {
       <FriendInfoRow>
         <FriendInfo>
           <FriendName>{getFriendName()}</FriendName>
-          <FriendEmail>{friend.friend?.email}</FriendEmail>
+          <FriendEmail>{friend.users_view?.email}</FriendEmail>
         </FriendInfo>
       </FriendInfoRow>
       

@@ -143,7 +143,7 @@ export const getFriends = async (userId: string) => {
     .from('friends')
     .select(`
       *,
-      friend:friend_id(*)
+      users_view:friend_id(*)
     `)
     .eq('user_id', userId);
   

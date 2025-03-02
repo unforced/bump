@@ -49,7 +49,7 @@ export interface Friend {
   user_id: string;
   friend_id: string;
   intend_to_bump: 'off' | 'private' | 'shared';
-  friend?: User;
+  users_view?: User;
 }
 
 export interface Settings {
