@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import styled from 'styled-components';
 import { GoogleMap, useLoadScript, Marker } from '@react-google-maps/api';
 import { Place } from '../types';
@@ -128,10 +128,27 @@ const PlaceForm: React.FC<PlaceFormProps> = ({ initialPlace, onSubmit, onCancel 
   );
   const [error, setError] = useState('');
 
+  // Log Google Maps API key status (without exposing the actual key)
+  useEffect(() => {
+    console.log('Google Maps API Key available:', !!import.meta.env.VITE_GOOGLE_MAPS_API_KEY);
+    if (!import.meta.env.VITE_GOOGLE_MAPS_API_KEY) {
+      console.error('Missing Google Maps API Key. Check your .env files or Vercel environment variables.');
+      setError('Google Maps API Key is missing. Please check your configuration.');
+    }
+  }, []);
+
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '',
     libraries: libraries as any,
   });
+
+  // Display error if Google Maps fails to load
+  useEffect(() => {
+    if (loadError) {
+      console.error('Error loading Google Maps API:', loadError);
+      setError('Failed to load Google Maps. Please try again later.');
+    }
+  }, [loadError]);
 
   const handleMapClick = useCallback((e: google.maps.MapMouseEvent) => {
     if (e.latLng) {

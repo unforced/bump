@@ -3,12 +3,20 @@ import { Place } from '../types';
 
 // These would typically come from environment variables
 // For the MVP, we'll use import.meta.env for Vite
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'YOUR_SUPABASE_URL';
-const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'YOUR_SUPABASE_KEY';
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+// Log environment variable status (without exposing actual values)
+console.log('Supabase URL available:', !!supabaseUrl);
+console.log('Supabase Key available:', !!supabaseKey);
+
+if (!supabaseUrl || !supabaseKey) {
+  console.error('Missing Supabase environment variables. Check your .env files or Vercel environment variables.');
+}
 
 // Create a single supabase client for interacting with your database
 // Adding specific options for WebSocket connections
-export const supabase = createClient(supabaseUrl, supabaseKey, {
+export const supabase = createClient(supabaseUrl || 'https://diplkutncouzjnxyssop.supabase.co', supabaseKey || '', {
   realtime: {
     params: {
       eventsPerSecond: 10,
