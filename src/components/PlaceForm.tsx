@@ -284,6 +284,10 @@ const PlaceForm: React.FC<PlaceFormProps> = ({ initialPlace, onSubmit, onCancel 
     if (isLoaded && !loadError) {
       autocompleteService.current = new google.maps.places.AutocompleteService();
       
+      // Create a hidden div to initialize the Places service
+      const placesDiv = document.createElement('div');
+      placesService.current = new google.maps.places.PlacesService(placesDiv);
+      
       // Try to get user's current location
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
@@ -303,11 +307,14 @@ const PlaceForm: React.FC<PlaceFormProps> = ({ initialPlace, onSubmit, onCancel 
     }
   }, [isLoaded, loadError]);
 
-  // Initialize places service when map is ready
+  // Update places service when map is ready (for better map-based features)
   const onMapLoad = useCallback((map: google.maps.Map) => {
     mapRef.current = map;
-    placesService.current = new google.maps.places.PlacesService(map);
-  }, []);
+    // Update the places service to use the map for better results
+    if (isLoaded) {
+      placesService.current = new google.maps.places.PlacesService(map);
+    }
+  }, [isLoaded]);
 
   // Handle search input changes
   useEffect(() => {
