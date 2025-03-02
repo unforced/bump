@@ -7,8 +7,10 @@ import Meetups from './pages/Meetups';
 import Settings from './pages/Settings';
 import Login from './pages/Login';
 import Navigation from './components/Navigation';
+import NotificationBell from './components/NotificationBell';
 import ProtectedRoute from './components/ProtectedRoute';
 import { AuthProvider } from './contexts/AuthContext';
+import { NotificationProvider } from './contexts/NotificationContext';
 import './App.css';
 
 const AppContainer = styled.div`
@@ -30,8 +32,17 @@ const AppContainer = styled.div`
   }
 `;
 
+const Header = styled.header`
+  display: flex;
+  justify-content: flex-end;
+  padding: 16px;
+`;
+
 const MainLayout = ({ children }: { children: React.ReactNode }) => (
   <AppContainer>
+    <Header>
+      <NotificationBell />
+    </Header>
     {children}
     <Navigation />
   </AppContainer>
@@ -40,39 +51,41 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => (
 function App() {
   return (
     <AuthProvider>
-      <Router>
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          
-          <Route element={<ProtectedRoute />}>
-            <Route path="/" element={
-              <MainLayout>
-                <Home />
-              </MainLayout>
-            } />
-            <Route path="/places" element={
-              <MainLayout>
-                <Places />
-              </MainLayout>
-            } />
-            <Route path="/friends" element={
-              <MainLayout>
-                <Friends />
-              </MainLayout>
-            } />
-            <Route path="/meetups" element={
-              <MainLayout>
-                <Meetups />
-              </MainLayout>
-            } />
-            <Route path="/settings" element={
-              <MainLayout>
-                <Settings />
-              </MainLayout>
-            } />
-          </Route>
-        </Routes>
-      </Router>
+      <NotificationProvider>
+        <Router>
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            
+            <Route element={<ProtectedRoute />}>
+              <Route path="/" element={
+                <MainLayout>
+                  <Home />
+                </MainLayout>
+              } />
+              <Route path="/places" element={
+                <MainLayout>
+                  <Places />
+                </MainLayout>
+              } />
+              <Route path="/friends" element={
+                <MainLayout>
+                  <Friends />
+                </MainLayout>
+              } />
+              <Route path="/meetups" element={
+                <MainLayout>
+                  <Meetups />
+                </MainLayout>
+              } />
+              <Route path="/settings" element={
+                <MainLayout>
+                  <Settings />
+                </MainLayout>
+              } />
+            </Route>
+          </Routes>
+        </Router>
+      </NotificationProvider>
     </AuthProvider>
   );
 }

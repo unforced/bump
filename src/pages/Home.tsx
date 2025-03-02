@@ -6,6 +6,7 @@ import StatusCard from '../components/StatusCard';
 import { Status } from '../types';
 import { checkIn, getActiveStatuses, supabase } from '../services/supabase';
 import { useAuth } from '../contexts/AuthContext';
+import { useNotifications } from '../contexts/NotificationContext';
 
 const HomeContainer = styled.div`
   padding: 20px;
@@ -56,6 +57,23 @@ const EmptyState = styled.div`
   padding: 20px;
   text-align: center;
   margin-top: 20px;
+`;
+
+const TestNotificationButton = styled.button`
+  background-color: #e67e22; /* Orange */
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 14px;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    background-color: #d35400;
+    transform: scale(1.05);
+  }
 `;
 
 // Fallback mock data in case Supabase connection fails
@@ -127,6 +145,7 @@ const Home: React.FC = () => {
   const [statuses, setStatuses] = useState<Status[]>([]);
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
+  const { addNotification } = useNotifications();
 
   useEffect(() => {
     const fetchStatuses = async () => {
@@ -201,10 +220,22 @@ const Home: React.FC = () => {
     return acc;
   }, {});
 
+  const sendTestNotification = () => {
+    addNotification({
+      title: 'Test Notification',
+      message: 'This is a test notification to demonstrate the notification system!',
+      type: 'system'
+    });
+  };
+
   return (
     <HomeContainer>
       <h1>Bump</h1>
       <p>See where your friends are hanging out</p>
+      
+      <TestNotificationButton onClick={sendTestNotification}>
+        Send Test Notification
+      </TestNotificationButton>
       
       <StatusList>
         {loading ? (

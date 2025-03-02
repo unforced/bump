@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useAuth } from '../contexts/AuthContext';
+import { useNotifications } from '../contexts/NotificationContext';
 import { useNavigate } from 'react-router-dom';
 
 const SettingsContainer = styled.div`
@@ -106,9 +107,43 @@ const ButtonGroup = styled.div`
   margin-top: 20px;
 `;
 
+const RadioGroup = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-top: 10px;
+  
+  label {
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    
+    input {
+      margin-right: 8px;
+    }
+  }
+`;
+
 const Settings: React.FC = () => {
   const { signOut, user } = useAuth();
+  const { settings, updateNotificationSettings, doNotDisturb, toggleDoNotDisturb } = useNotifications();
   const navigate = useNavigate();
+  
+  const [availabilityStart, setAvailabilityStart] = useState('09:00');
+  const [availabilityEnd, setAvailabilityEnd] = useState('17:00');
+  const [notifyFor, setNotifyFor] = useState<'all' | 'intended' | 'none'>('all');
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveMessage, setSaveMessage] = useState('');
+  
+  // Load settings when available
+  useEffect(() => {
+    if (settings) {
+      setAvailabilityStart(settings.availability_start);
+      setAvailabilityEnd(settings.availability_end);
+      setNotifyFor(settings.notify_for);
+    }
+  }, [settings]);
   
   const handleLogout = async () => {
     try {
@@ -116,6 +151,29 @@ const Settings: React.FC = () => {
       navigate('/login');
     } catch (error) {
       console.error('Error signing out:', error);
+    }
+  };
+  
+  const handleSaveSettings = async () => {
+    if (!user) return;
+    
+    setIsSaving(true);
+    setSaveMessage('');
+    
+    try {
+      await updateNotificationSettings({
+        availability_start: availabilityStart,
+        availability_end: availabilityEnd,
+        notify_for: notifyFor
+      });
+      
+      setSaveMessage('Settings saved successfully!');
+      setTimeout(() => setSaveMessage(''), 3000);
+    } catch (error) {
+      console.error('Error saving settings:', error);
+      setSaveMessage('Error saving settings. Please try again.');
+    } finally {
+      setIsSaving(false);
     }
   };
   
@@ -136,27 +194,83 @@ const Settings: React.FC = () => {
         <p>Set your default availability times for notifications</p>
         <div>
           <label>Start Time: </label>
-          <input type="time" defaultValue="09:00" />
+          <input 
+            type="time" 
+            value={availabilityStart}
+            onChange={(e) => setAvailabilityStart(e.target.value)}
+          />
         </div>
         <div style={{ marginTop: '10px' }}>
           <label>End Time: </label>
-          <input type="time" defaultValue="17:00" />
+          <input 
+            type="time" 
+            value={availabilityEnd}
+            onChange={(e) => setAvailabilityEnd(e.target.value)}
+          />
         </div>
       </SettingsSection>
       
       <SettingsSection>
         <h2>Notifications</h2>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
           <p>Do Not Disturb</p>
           <ToggleSwitch>
-            <input type="checkbox" />
+            <input 
+              type="checkbox" 
+              checked={doNotDisturb}
+              onChange={toggleDoNotDisturb}
+            />
             <span></span>
           </ToggleSwitch>
         </div>
+        
+        <div style={{ textAlign: 'left' }}>
+          <p>Notify me for:</p>
+          <RadioGroup>
+            <label>
+              <input 
+                type="radio" 
+                name="notifyFor" 
+                value="all" 
+                checked={notifyFor === 'all'}
+                onChange={() => setNotifyFor('all')}
+              />
+              All friend check-ins
+            </label>
+            <label>
+              <input 
+                type="radio" 
+                name="notifyFor" 
+                value="intended" 
+                checked={notifyFor === 'intended'}
+                onChange={() => setNotifyFor('intended')}
+              />
+              Only "Intend to Bump" friends
+            </label>
+            <label>
+              <input 
+                type="radio" 
+                name="notifyFor" 
+                value="none" 
+                checked={notifyFor === 'none'}
+                onChange={() => setNotifyFor('none')}
+              />
+              None (disable check-in notifications)
+            </label>
+          </RadioGroup>
+        </div>
       </SettingsSection>
       
+      {saveMessage && (
+        <p style={{ color: saveMessage.includes('Error') ? '#e74c3c' : '#4a7c59' }}>
+          {saveMessage}
+        </p>
+      )}
+      
       <ButtonGroup>
-        <SaveButton>Save Settings</SaveButton>
+        <SaveButton onClick={handleSaveSettings} disabled={isSaving}>
+          {isSaving ? 'Saving...' : 'Save Settings'}
+        </SaveButton>
         <LogoutButton onClick={handleLogout}>Logout</LogoutButton>
       </ButtonGroup>
     </SettingsContainer>
