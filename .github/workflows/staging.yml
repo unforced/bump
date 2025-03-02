@@ -22,5 +22,24 @@ jobs:
         with:
           version: latest
 
-      - run: supabase link --project-ref "$SUPABASE_PROJECT_ID" --password "$SUPABASE_DB_PASSWORD"
-      - run: supabase db push
+      # Debug steps
+      - name: Debug Environment Variables
+        run: |
+          echo "Checking environment variables (values redacted for security)"
+          if [ -n "$SUPABASE_ACCESS_TOKEN" ]; then echo "SUPABASE_ACCESS_TOKEN is set"; else echo "SUPABASE_ACCESS_TOKEN is NOT set"; fi
+          if [ -n "$SUPABASE_DB_PASSWORD" ]; then echo "SUPABASE_DB_PASSWORD is set"; else echo "SUPABASE_DB_PASSWORD is NOT set"; fi
+          if [ -n "$SUPABASE_PROJECT_ID" ]; then echo "SUPABASE_PROJECT_ID is set"; else echo "SUPABASE_PROJECT_ID is NOT set"; fi
+          echo "Supabase CLI version:"
+          supabase --version
+
+      # Initialize Supabase project
+      - name: Initialize Supabase project
+        run: supabase init
+
+      # Link with debug flag
+      - name: Link to Supabase project
+        run: supabase link --project-ref "$SUPABASE_PROJECT_ID" --password "$SUPABASE_DB_PASSWORD" --debug
+      
+      # Push database changes
+      - name: Push database changes
+        run: supabase db push
