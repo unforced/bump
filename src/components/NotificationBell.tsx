@@ -39,7 +39,7 @@ const Badge = styled.div`
   font-weight: bold;
 `;
 
-const NotificationDropdown = styled.div<{ isOpen: boolean }>`
+const NotificationDropdown = styled.div<{ $isOpen: boolean }>`
   position: absolute;
   top: 40px;
   right: 0;
@@ -50,7 +50,7 @@ const NotificationDropdown = styled.div<{ isOpen: boolean }>`
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   z-index: 1000;
-  display: ${props => props.isOpen ? 'block' : 'none'};
+  display: ${props => props.$isOpen ? 'block' : 'none'};
 `;
 
 const NotificationHeader = styled.div`
@@ -83,10 +83,10 @@ const NotificationList = styled.div`
   padding: 0;
 `;
 
-const NotificationItem = styled.div<{ isRead: boolean }>`
+const NotificationItem = styled.div<{ $isRead: boolean }>`
   padding: 12px 16px;
   border-bottom: 1px solid #eee;
-  background-color: ${props => props.isRead ? 'white' : '#f5f9f7'};
+  background-color: ${props => props.$isRead ? 'white' : '#f5f9f7'};
   cursor: pointer;
   
   &:hover {
@@ -174,7 +174,7 @@ const NotificationBell: React.FC = () => {
         {unreadCount > 0 && <Badge>{unreadCount > 9 ? '9+' : unreadCount}</Badge>}
       </Bell>
       
-      <NotificationDropdown isOpen={isOpen}>
+      <NotificationDropdown $isOpen={isOpen}>
         <NotificationHeader>
           <NotificationTitle>Notifications</NotificationTitle>
           {notifications.length > 0 && (
@@ -189,7 +189,7 @@ const NotificationBell: React.FC = () => {
             notifications.map(notification => (
               <NotificationItem 
                 key={notification.id} 
-                isRead={notification.read}
+                $isRead={notification.read}
                 onClick={() => handleItemClick(notification.id)}
               >
                 <NotificationContent>

@@ -86,7 +86,7 @@ const fallbackMockStatuses: Status[] = [
     privacy: 'all',
     timestamp: new Date().toISOString(),
     is_active: true,
-    users: {
+    users_view: {
       id: '101',
       email: 'sarah@example.com',
       username: 'Sarah',
@@ -106,7 +106,7 @@ const fallbackMockStatuses: Status[] = [
     privacy: 'all',
     timestamp: new Date(Date.now() - 30 * 60000).toISOString(), // 30 minutes ago
     is_active: true,
-    users: {
+    users_view: {
       id: '102',
       email: 'alex@example.com',
       username: 'Alex',
@@ -126,7 +126,7 @@ const fallbackMockStatuses: Status[] = [
     privacy: 'all',
     timestamp: new Date(Date.now() - 15 * 60000).toISOString(), // 15 minutes ago
     is_active: true,
-    users: {
+    users_view: {
       id: '103',
       email: 'jamie@example.com',
       username: 'Jamie',
