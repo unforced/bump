@@ -351,6 +351,9 @@ const PlaceForm: React.FC<PlaceFormProps> = ({ initialPlace, onSubmit, onCancel 
   const handleSuggestionSelect = (placeId: string) => {
     if (!placesService.current) return;
 
+    // Hide suggestions immediately upon selection
+    setShowSuggestions(false);
+
     placesService.current.getDetails(
       { placeId, fields: ['name', 'geometry', 'types', 'formatted_address'] },
       (place, status) => {
@@ -372,6 +375,7 @@ const PlaceForm: React.FC<PlaceFormProps> = ({ initialPlace, onSubmit, onCancel 
           
           // Keep the place name in the search bar instead of clearing it
           setSearchQuery(place.name || '');
+          // This setShowSuggestions(false) is redundant now but kept for safety
           setShowSuggestions(false);
           
           // Center map on the selected place
@@ -476,6 +480,9 @@ const PlaceForm: React.FC<PlaceFormProps> = ({ initialPlace, onSubmit, onCancel 
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search for a place..."
                 onFocus={() => setShowSuggestions(true)}
+                onBlur={() => {
+                  setTimeout(() => setShowSuggestions(false), 200);
+                }}
               />
               
               {showSuggestions && suggestions.length > 0 && (
