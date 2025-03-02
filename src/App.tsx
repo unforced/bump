@@ -11,12 +11,13 @@ import NotificationBell from './components/NotificationBell';
 import ProtectedRoute from './components/ProtectedRoute';
 import { AuthProvider } from './contexts/AuthContext';
 import { NotificationProvider } from './contexts/NotificationContext';
+import { ThemeProvider } from './contexts/ThemeContext';
 import './App.css';
 
 const AppContainer = styled.div`
   font-family: 'Inter', sans-serif;
-  color: #333;
-  background-color: #f9f7f2;
+  color: ${props => props.theme.colors.text};
+  background-color: ${props => props.theme.colors.background};
   min-height: 100vh;
   padding-bottom: 70px; /* Space for the navigation bar */
   display: flex;
@@ -27,7 +28,7 @@ const AppContainer = styled.div`
   @media (min-width: 768px) {
     max-width: 600px;
     margin: 0 auto;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    box-shadow: ${props => props.theme.shadows.lg};
     min-height: 100vh;
   }
 `;
@@ -39,7 +40,7 @@ const Header = styled.header`
 `;
 
 const MainLayout = ({ children }: { children: React.ReactNode }) => (
-  <AppContainer>
+  <AppContainer className="fade-in">
     <Header>
       <NotificationBell />
     </Header>
@@ -50,43 +51,45 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => (
 
 function App() {
   return (
-    <AuthProvider>
-      <NotificationProvider>
-        <Router>
-          <Routes>
-            <Route path="/login" element={<Login />} />
-            
-            <Route element={<ProtectedRoute />}>
-              <Route path="/" element={
-                <MainLayout>
-                  <Home />
-                </MainLayout>
-              } />
-              <Route path="/places" element={
-                <MainLayout>
-                  <Places />
-                </MainLayout>
-              } />
-              <Route path="/friends" element={
-                <MainLayout>
-                  <Friends />
-                </MainLayout>
-              } />
-              <Route path="/meetups" element={
-                <MainLayout>
-                  <Meetups />
-                </MainLayout>
-              } />
-              <Route path="/settings" element={
-                <MainLayout>
-                  <Settings />
-                </MainLayout>
-              } />
-            </Route>
-          </Routes>
-        </Router>
-      </NotificationProvider>
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <NotificationProvider>
+          <Router>
+            <Routes>
+              <Route path="/login" element={<Login />} />
+              
+              <Route element={<ProtectedRoute />}>
+                <Route path="/" element={
+                  <MainLayout>
+                    <Home />
+                  </MainLayout>
+                } />
+                <Route path="/places" element={
+                  <MainLayout>
+                    <Places />
+                  </MainLayout>
+                } />
+                <Route path="/friends" element={
+                  <MainLayout>
+                    <Friends />
+                  </MainLayout>
+                } />
+                <Route path="/meetups" element={
+                  <MainLayout>
+                    <Meetups />
+                  </MainLayout>
+                } />
+                <Route path="/settings" element={
+                  <MainLayout>
+                    <Settings />
+                  </MainLayout>
+                } />
+              </Route>
+            </Routes>
+          </Router>
+        </NotificationProvider>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
 
